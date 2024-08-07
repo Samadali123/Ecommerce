@@ -4,10 +4,16 @@ const app = express();
 const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const usersRoutes = require("./routes/userRoutes")
+const cors = require("cors")
+
 
 
 // setting up a database connection
 require("./config/db.config").DbConnection();
+
+//cors setup
+app.use(cors());
+
 
 // Logger middleware
 app.use(logger('tiny'));

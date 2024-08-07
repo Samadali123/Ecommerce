@@ -85,3 +85,11 @@ exports.logoutaccount = (req, res) => {
 
 }
 
+exports.shopaccount = (req, res) => {
+     try { 
+        res.json({success: true, message : "Shop Page"})
+     } catch (error) {
+           res.status(500).json({success : false , message : "Internal Server Error"})
+     }
+}
+
