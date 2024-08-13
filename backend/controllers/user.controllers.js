@@ -269,14 +269,17 @@ exports.updatePassword = async (req, res) => {
 
 exports.changePassword = async (req, res) => {
     const { currentPassword, newPassword, confirmPassword } = req.body;
-    const userId = req.user._id; // Assuming user ID is attached to req.user
+    const userId = req.user.userid; // Assuming user ID is attached to req.user
+
+    if (!currentPassword || !newPassword || !confirmPassword) {
+        return res.status(400).json({ success: false, message: 'All fields are required.' });
+    }
+
+    if (newPassword !== confirmPassword) {
+        return res.status(400).json({ success: false, message: 'New passwords do not match.' });
+    }
 
     try {
-        // Check if new passwords match
-        if (newPassword !== confirmPassword) {
-            return res.status(400).json({ success: false, message: 'New passwords do not match.' });
-        }
-
         // Find user by ID
         const user = await userModel.findById(userId);
         if (!user) {
@@ -286,17 +289,23 @@ exports.changePassword = async (req, res) => {
         // Verify current password
         const isMatch = await bcrypt.compare(currentPassword, user.password);
         if (!isMatch) {
-            return res.status(400).json({ success: false, message: 'Current password is incorrect.' });
+            return res.status(400).json({ success: false, message: 'Current password is incorrect, forgot your password' });
         }
 
         // Hash new password and update user record
         user.password = await bcrypt.hash(newPassword, 12);
         await user.save();
 
-        res.status(200).json({ success: true, message: 'Password updated successfully.' });
+        return res.status(200).json({ success: true, message: 'Password updated successfully.' });
+
     } catch (error) {
-        console.error('Error in changePassword controller:', error);
-        res.status(500).json({ success: false, message: 'An error occurred. Please try again later.' });
+        // Log the error details
+        console.error('Error in changePassword controller:', error.message);
+
+        // Check if headers have already been sent
+        if (!res.headersSent) {
+            return res.status(500).json({ success: false, message: 'An error occurred. Please try again later.' });
+        }
     }
 };
 
