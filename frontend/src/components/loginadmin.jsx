@@ -9,8 +9,9 @@ import { GoogleLogin } from '@react-oauth/google';
 import {jwtDecode} from 'jwt-decode'; 
 
 
-const Login = () => {
+const Loginadmin = () => {
   const [isAuthenticated, setIsAuthenticated] = useContext(UserContext);
+  
 
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -42,7 +43,7 @@ const Login = () => {
       Cookies.set('token', response.data.token, { expires: 1 / 24 });
 
       setIsAuthenticated(true);
-      navigate('/'); 
+      navigate('/admin'); 
     } catch (err) {
     
       console.error('Login error:', err.response ? err.response.data : err.message);
@@ -69,7 +70,7 @@ const Login = () => {
       
       Cookies.set('token', response.data.token, { expires: 1 / 24 });
       setIsAuthenticated(true);
-      navigate('/');
+      navigate('/admin');
     } catch (error) {
       console.error('Error during Google login:', error);
       setError('Google login failed. Please try again.');
@@ -79,7 +80,7 @@ const Login = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
-        <h1 className="text-2xl font-bold mb-6">Login</h1>
+        <h1 className="text-2xl font-bold mb-6">Admin Login</h1>
 
         <GoogleLogin
           onSuccess={handleGoogleLoginSuccess}
@@ -129,15 +130,9 @@ const Login = () => {
             Register
           </span>
         </p>
-        <p className="mt-4 text-gray-600 text-center">
-          Want to login as Admin ?{' '}
-          <span onClick={() => navigate('/loginadmin')} className="text-blue-600 cursor-pointer">
-            Admin Login
-          </span>
-        </p>
       </div>
     </div>
   );
 };
 
-export default Login;
+export default Loginadmin;

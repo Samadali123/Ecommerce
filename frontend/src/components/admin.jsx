@@ -1,13 +1,17 @@
 
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect,useContext, useState } from 'react';
 import AccessDenied from '../components/AccessDenied';
 import Loader from '../components/loader';
 import axios from '../utils/axios';
 import { toast } from 'react-toastify';
+import UserContext from '../contexts/usercontext';
+import { useNavigate } from 'react-router-dom';
 
 const Admin = () => {
    const [isAdmin, setIsAdmin] = useState(false)
+   const [isAuthenticated, setIsAuthenticated] = useContext(UserContext);
+   const navigate = useNavigate();
   useEffect(() => {
     // Function to check if the user is an admin
     const checkAdminStatus = async () => {
@@ -31,6 +35,27 @@ const Admin = () => {
 
     checkAdminStatus();
   }, []);
+  const logout = async () => {
+    // Extract the token from the cookie
+    const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
+    if (token) {
+      try {
+        // Perform the logout request with the token in the body
+        await axios.get(`/logout?token=${token}`);
+        // Clear the token cookie
+        document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;';
+
+        // Update the authentication state and navigate to the login page
+        setIsAuthenticated(false);
+        navigate('/login');
+      } catch (error) {
+        console.error('Logout error:', error);
+        toast.error('Error during logout. Please try again.');
+      }
+    } else {
+      toast.info('Please sign in to sign out.');
+    }
+  };
 
   
   return (
@@ -64,7 +89,7 @@ const Admin = () => {
         <main className="flex-1 p-8 bg-gray-100">
           <header className="flex justify-between items-center mb-8">
             <h1 className="text-3xl font-bold">Dashboard</h1>
-            <button className="bg-blue-600 text-white px-4 py-2 rounded-lg">Logout</button>
+            <button  onClick={logout} className="bg-blue-600 text-white px-4 py-2 rounded-lg">Logout</button>
           </header>
           
           {/* Dashboard Content */}

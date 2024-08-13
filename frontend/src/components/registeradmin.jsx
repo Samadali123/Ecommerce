@@ -9,8 +9,8 @@ import Cookies from 'js-cookie'; // Import js-cookie
 import UserContext from '../contexts/usercontext';
 
 
-const Register = () => {
-
+const Registeradmin = () => {
+ 
   const [isAuthenticated, setIsAuthenticated] = useContext(UserContext);
 
   const navigate = useNavigate();
@@ -19,7 +19,7 @@ const Register = () => {
     email: '',
     password: '',
     confirmPassword: '',
-    isAdmin: false,
+    isAdmin: true,
   });
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -55,14 +55,14 @@ const Register = () => {
 
       // Handle successful registration
       console.log('Registration successful:', response.data);
-
+      
       // Set the token as a cookie for 1 hour
       Cookies.set('token', response.data.token, { expires: 1 / 24 }); // 1 hour
 
       toast.success("Registered Successfully.");
-
+      
       setIsAuthenticated(true)
-
+      
 
       navigate('/login'); // Redirect to the login page upon success
     } catch (err) {
@@ -77,7 +77,7 @@ const Register = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
-        <h1 className="text-2xl font-bold mb-6">Register</h1>
+        <h1 className="text-2xl font-bold mb-6">Register Admin</h1>
         <form onSubmit={handleSubmit}>
           {error && <p className="text-red-600 mb-4">{error}</p>}
           <div className="mb-4">
@@ -156,11 +156,10 @@ const Register = () => {
             Login
           </a>
         </p>
-        
       </div>
     </div>
   );
 };
 
-export default Register;
+export default Registeradmin;
 
