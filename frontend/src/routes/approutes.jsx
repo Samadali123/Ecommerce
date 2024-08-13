@@ -9,6 +9,8 @@ import Admin from '../components/admin';
 import About from '../components/about'
 import Contact from '../components/contact'
 import NotFound from '../components/NotFoundPage'
+import Loginadmin from '../components/loginadmin'
+import Registeradmin from '../components/registeradmin';
 
 
 
@@ -23,6 +25,8 @@ const routes = () => {
             <Route path="/admin" element={<Admin/>}></Route>
             <Route path="/about" element={<About/>}></Route>
             <Route path="/contact" element={<Contact/>}></Route>    
+            <Route path='/loginadmin' element={<Loginadmin/>}></Route>
+            <Route path='/registeradmin' element={<Registeradmin/>}></Route>
             <Route path="*" element={<NotFound/>}></Route>    
             </Routes>    
     )

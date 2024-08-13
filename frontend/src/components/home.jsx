@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext ,useState} from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from '../utils/axios';
 import { toast } from 'react-toastify';
@@ -8,6 +8,7 @@ import UserContext from '../contexts/usercontext';
 const Home = () => {
   const [isAuthenticated, setIsAuthenticated] = useContext(UserContext);
   const navigate = useNavigate();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const logout = async () => {
     // Extract the token from the cookie
@@ -34,47 +35,104 @@ const Home = () => {
   return (
     <div className="home bg-gray-100 text-gray-800 overflow-x-hidden overflow-y-auto">
       {/* Header */}
-      <header className="bg-white shadow-lg">
-        <div className="container mx-auto px-4 py-5">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            {/* Logo */}
-            <div className="text-3xl font-extrabold text-gray-900 mb-4 md:mb-0">
-              Apna@Mart
-            </div>
+      <header className="bg-white shadow-lg sticky top-0 z-50">
+  <div className="container mx-auto px-4 py-4 md:py-5 flex flex-col md:flex-row justify-between items-center">
+    {/* Logo */}
+    <div className="text-4xl font-extrabold text-gray-900 mb-4 md:mb-0 tracking-wide">
+      Apna<span className="text-blue-600">@Mart</span>
+    </div>
 
-            {/* Navigation */}
-            <nav className="flex flex-col md:flex-row items-center md:space-x-8 space-y-4 md:space-y-0">
-              <input
-                className='px-6 py-3 bg-gray-200 text-gray-700 placeholder-gray-500 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all duration-300 w-full md:w-auto'
-                type="text"
-                placeholder="Search here..."
-              />
-              <Link to="/shop" className="text-lg font-medium text-gray-700 hover:text-gray-900 transition-colors duration-300">Shop</Link>
-              <Link to="/about" className="text-lg font-medium text-gray-700 hover:text-gray-900 transition-colors duration-300">About Us</Link>
-              <Link to="/contact" className="text-lg font-medium text-gray-700 hover:text-gray-900 transition-colors duration-300">Contact Us</Link>
-            </nav>
+    {/* Menu button for mobile */}
+    <button
+      className="md:hidden text-gray-700 hover:text-gray-900 focus:outline-none"
+      onClick={() => setIsMenuOpen(!isMenuOpen)}
+    >
+      <svg
+        className="w-8 h-8"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="2"
+          d={isMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16m-7 6h7"}
+        />
+      </svg>
+    </button>
 
-            {/* User Actions */}
-            <div className="flex flex-col md:flex-row items-center mt-4 md:mt-0 space-y-4 md:space-y-0 md:space-x-6">
-              <Link to="/login" className="bg-blue-500 hover:bg-blue-700 text-white px-5 py-2 rounded-full font-semibold transition duration-300 shadow-md">Sign In</Link>
-              <Link to="/register" className="bg-blue-500 hover:bg-blue-700 text-white px-5 py-2 rounded-full font-semibold transition duration-300 shadow-md">Sign Up</Link>
-              <button onClick={logout} className='px-5 py-2 bg-red-500 text-white rounded-full font-semibold hover:bg-red-600 transition duration-300 shadow-md'>Logout</button>
-              <div className="flex space-x-4 mt-2 md:mt-0">
-                <i className="fas fa-search cursor-pointer text-xl text-gray-600 hover:text-gray-900 transition-colors duration-300"></i>
-                <i className="fas fa-user cursor-pointer text-xl text-gray-600 hover:text-gray-900 transition-colors duration-300"></i>
-                <i className="fas fa-shopping-cart cursor-pointer text-xl text-gray-600 hover:text-gray-900 transition-colors duration-300"></i>
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
+    {/* Navigation */}
+    <nav
+      className={`flex-col md:flex-row items-center md:space-x-8 space-y-4 md:space-y-0 md:flex ${isMenuOpen ? "flex" : "hidden"
+        }`}
+    >
+      <input
+        className="px-6 py-3 bg-gray-100 text-gray-700 placeholder-gray-500 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all duration-300 w-full md:w-80 lg:w-96"
+        type="text"
+        placeholder="Search for products..."
+      />
+      <Link
+        to="/shop"
+        className="text-lg font-medium text-gray-700 hover:text-blue-600 transition-colors duration-300"
+      >
+        Shop
+      </Link>
+      <Link
+        to="/about"
+        className="text-lg font-medium text-gray-700 hover:text-blue-600 transition-colors duration-300"
+      >
+        About Us
+      </Link>
+      <Link
+        to="/contact"
+        className="text-lg font-medium text-gray-700 hover:text-blue-600 transition-colors duration-300"
+      >
+        Contact Us
+      </Link>
+    </nav>
+
+    {/* User Actions */}
+    <div className="flex flex-col md:flex-row items-center mt-4 md:mt-0 space-y-4 md:space-y-0 md:space-x-6">
+      {isAuthenticated ? (
+        <button
+          onClick={logout}
+          className="px-5 py-2 bg-red-500 text-white rounded-full font-semibold hover:bg-red-600 transition duration-300 shadow-lg"
+        >
+          Logout
+        </button>
+      ) : (
+        <>
+          <Link
+            to="/login"
+            className="bg-blue-500 hover:bg-blue-700 text-white px-5 py-2 rounded-full font-semibold transition duration-300 shadow-lg"
+          >
+            Sign In
+          </Link>
+          <Link
+            to="/register"
+            className="bg-blue-500 hover:bg-blue-700 text-white px-5 py-2 rounded-full font-semibold transition duration-300 shadow-lg"
+          >
+            Sign Up
+          </Link>
+        </>
+      )}
+      <div className="flex space-x-6 mt-2 md:mt-0">
+        <i className="fas fa-search cursor-pointer text-xl text-gray-600 hover:text-blue-600 transition-colors duration-300"></i>
+        <i className="fas fa-user cursor-pointer text-xl text-gray-600 hover:text-blue-600 transition-colors duration-300"></i>
+        <i className="fas fa-shopping-cart cursor-pointer text-xl text-gray-600 hover:text-blue-600 transition-colors duration-300"></i>
+      </div>
+    </div>
+  </div>
+</header>
 
       {/* Hero Banner */}
 <section className="relative">
   <img
     src="https://plus.unsplash.com/premium_photo-1664201890375-f8fa405cdb7d?q=80&w=1770&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
     alt="Hero Banner"
-    className="w-full h-[80vh] object-cover"
+    className="w-full h-[80vh] object-fit-cover"
   />
   <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white bg-gradient-to-b from-black/70 via-transparent to-black/70 p-4 md:p-8">
     <h1 className="text-4xl md:text-6xl font-extrabold drop-shadow-lg leading-tight">Welcome to Our Premium Store</h1>
