@@ -4,17 +4,17 @@ const app = express();
 const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const usersRoutes = require("./routes/userRoutes")
+const adminRoutes = require("./routes/adminRoutes")
+const productRoutes = require("./routes/productRoutes");
+
+
 const cors = require("cors")
-
-
 
 // setting up a database connection
 require("./config/db.config").DbConnection();
 
-//cors setup
-app.use(cors());
-
-
+// used for connect backend and frontend blacklist urls
+app.use(cors())
 // Logger middleware
 app.use(logger('tiny'));
 
@@ -27,7 +27,14 @@ app.use(cookieParser());
 
 
 // base uri for user routes
-app.use(`/`, usersRoutes);
+app.use(`/Ecommerce/users/user`, usersRoutes);
+
+// base uri for Admin routes
+app.use("/Ecommerce/admins/admin", adminRoutes);
+
+// base uri for Product routes
+app.use('/Ecommerce/products', productRoutes);
+
 
 // Catch-all route for unknown paths
 app.all('*', (req, res) => {

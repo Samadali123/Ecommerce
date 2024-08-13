@@ -1,18 +1,19 @@
+
 const express = require('express');
-const { registeraccount, loginaccount, logoutaccount, shopaccount } = require('../controllers/user.controllers');
-const IsLoggedIn = require('../middlewares/auth.middleware');
+const { registeraccount, loginaccount, logoutaccount, shopaccount, adminaccount, loginWithGoogle } = require('../controllers/user.controllers');
+const { UserIsLoggedIn } = require('../middlewares/auth.middleware');
 const router = express.Router();
 
-// register account
-router.post("/register",   registeraccount)
+//register account
+router.post('/register', registeraccount);
 
-router.post("/login", loginaccount)
+//Login account
+router.post('/login', loginaccount);
 
-router.get("/logout", logoutaccount)
+//google/login
+router.post('/google/login', loginWithGoogle);
 
-router.get("/shop", IsLoggedIn, shopaccount);
+//logout
+router.get("/logout",UserIsLoggedIn , logoutaccount)
 
-module.exports = router
-
-
-
+module.exports = router;
