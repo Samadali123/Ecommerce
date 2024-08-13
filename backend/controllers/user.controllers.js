@@ -6,6 +6,8 @@ const secretKey = process.env.JWT_SECRET_KEY;
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 
+
+
 exports.registeraccount = async (req, res) => {
     try {
         const { username, email, password ,isAdmin} = req.body;
