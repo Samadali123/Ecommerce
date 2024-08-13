@@ -17,8 +17,7 @@ router.post("/google/login", adminloginWithGoogle)
 router.get("/logout",AdminIsLoggedIn, adminlogout)
 
 //admin/dashboard
-router.get('/dashboard', AdminIsLoggedIn, admindashboard);
-
+router.get('/admin/dashboard', AdminIsLoggedIn, admindashboard);
 
 // /forgotpassword
 router.post('/forgotpassword',  forgotPassword);
