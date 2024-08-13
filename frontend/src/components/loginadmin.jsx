@@ -4,13 +4,13 @@ import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from '../utils/axios';
 import Cookies from 'js-cookie';
-import UserContext from '../contexts/usercontext';
+import AdminContext from '../contexts/admincontext';
 import { GoogleLogin } from '@react-oauth/google';
 import {jwtDecode} from 'jwt-decode'; 
 
 
 const Loginadmin = () => {
-  const [isAuthenticated, setIsAuthenticated] = useContext(UserContext);
+  const [adminisAuthenticated, setadminIsAuthenticated] = useContext(AdminContext);
   
 
   const navigate = useNavigate();
@@ -32,7 +32,7 @@ const Loginadmin = () => {
     setError(null);
 
     try {
-      const response = await axios.post('/login', {
+      const response = await axios.post('/admins/admin/login', {
         email: formData.email,
         password: formData.password,
       });
@@ -42,7 +42,7 @@ const Loginadmin = () => {
 
       Cookies.set('token', response.data.token, { expires: 1 / 24 });
 
-      setIsAuthenticated(true);
+      setadminIsAuthenticated(true);
       navigate('/admin'); 
     } catch (err) {
     
@@ -60,7 +60,7 @@ const Loginadmin = () => {
   const handleGoogleLoginSuccess = async (credentialResponse) => {
     try {
       const data = jwtDecode(credentialResponse.credential);
-      const response = await axios.post('/google/login', {
+      const response = await axios.post('admins/admin/google/login', {
         username: data.name,
         email: data.email,
         isAdmin : false
@@ -69,7 +69,7 @@ const Loginadmin = () => {
       console.log('Google login successful:', response.data);
       
       Cookies.set('token', response.data.token, { expires: 1 / 24 });
-      setIsAuthenticated(true);
+      setadminIsAuthenticated(true);
       navigate('/admin');
     } catch (error) {
       console.error('Error during Google login:', error);
@@ -126,7 +126,7 @@ const Loginadmin = () => {
         </form>
         <p className="mt-4 text-gray-600 text-center">
           Don't have an account?{' '}
-          <span onClick={() => navigate('/register')} className="text-blue-600 cursor-pointer">
+          <span onClick={() => navigate('/registeradmin')} className="text-blue-600 cursor-pointer">
             Register
           </span>
         </p>

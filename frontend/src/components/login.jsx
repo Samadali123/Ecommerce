@@ -31,7 +31,7 @@ const Login = () => {
     setError(null);
 
     try {
-      const response = await axios.post('/login', {
+      const response = await axios.post('/users/user/login', {
         email: formData.email,
         password: formData.password,
       });
@@ -59,7 +59,7 @@ const Login = () => {
   const handleGoogleLoginSuccess = async (credentialResponse) => {
     try {
       const data = jwtDecode(credentialResponse.credential);
-      const response = await axios.post('/google/login', {
+      const response = await axios.post('/users/user/google/login', {
         username: data.name,
         email: data.email,
         isAdmin : false

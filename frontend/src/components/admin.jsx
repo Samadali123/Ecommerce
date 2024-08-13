@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router-dom';
 
 const Admin = () => {
    const [isAdmin, setIsAdmin] = useState(false)
-   const [isAuthenticated, setIsAuthenticated] = useContext(UserContext);
+   const [adminisAuthenticated, setadminIsAuthenticated] = useContext(UserContext);
    const navigate = useNavigate();
   useEffect(() => {
     // Function to check if the user is an admin
@@ -22,6 +22,7 @@ const Admin = () => {
         if (token) {
           
          const response = await axios.get(`/admin/dashboard?token=${token}`);
+         console.log(response)
           setIsAdmin(response.data.user.isAdmin)
         } 
         else{
@@ -46,7 +47,7 @@ const Admin = () => {
         document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;';
 
         // Update the authentication state and navigate to the login page
-        setIsAuthenticated(false);
+        setadminIsAuthenticated(false);
         navigate('/login');
       } catch (error) {
         console.error('Logout error:', error);

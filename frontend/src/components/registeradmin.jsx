@@ -6,12 +6,12 @@ import { useNavigate } from 'react-router-dom';
 import axios from '../utils/axios';
 import { toast } from 'react-toastify';
 import Cookies from 'js-cookie'; // Import js-cookie
-import UserContext from '../contexts/usercontext';
+import AdminContext from '../contexts/admincontext';
 
 
 const Registeradmin = () => {
  
-  const [isAuthenticated, setIsAuthenticated] = useContext(UserContext);
+  const [adminisAuthenticated, setadminIsAuthenticated] = useContext(AdminContext);
 
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -46,7 +46,7 @@ const Registeradmin = () => {
       }
 
       // Send a POST request to the /register API endpoint
-      const response = await axios.post('/register', {
+      const response = await axios.post('/admins/admin/register', {
         username: formData.name,
         email: formData.email,
         password: formData.password,
@@ -61,10 +61,10 @@ const Registeradmin = () => {
 
       toast.success("Registered Successfully.");
       
-      setIsAuthenticated(true)
+      setadminIsAuthenticated(true)
       
 
-      navigate('/login'); // Redirect to the login page upon success
+      navigate('/loginadmin'); // Redirect to the login page upon success
     } catch (err) {
       // Handle errors
       console.error('Registration error:', err.response ? err.response.data : err.message);
