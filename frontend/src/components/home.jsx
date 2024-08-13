@@ -16,7 +16,7 @@ const Home = () => {
     if (token) {
       try {
         // Perform the logout request with the token in the body
-        await axios.get(`/logout?token=${token}`);
+        await axios.get(`/users/user/logout?token=${token}`);
         // Clear the token cookie
         document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;';
 

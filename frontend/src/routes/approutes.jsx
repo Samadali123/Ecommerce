@@ -11,6 +11,7 @@ import Contact from '../components/contact'
 import NotFound from '../components/NotFoundPage'
 import Loginadmin from '../components/loginadmin'
 import Registeradmin from '../components/registeradmin';
+import AddProduct from '../components/addProducts.jsx';
 
 
 
@@ -27,6 +28,7 @@ const routes = () => {
             <Route path="/contact" element={<Contact/>}></Route>    
             <Route path='/loginadmin' element={<Loginadmin/>}></Route>
             <Route path='/registeradmin' element={<Registeradmin/>}></Route>
+            <Route path='/addproducts' element={<AddProduct/>}></Route>
             <Route path="*" element={<NotFound/>}></Route>    
             </Routes>    
     )

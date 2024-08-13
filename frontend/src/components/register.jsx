@@ -46,7 +46,7 @@ const Register = () => {
       }
 
       // Send a POST request to the /register API endpoint
-      const response = await axios.post('/register', {
+      const response = await axios.post('/users/user/register', {
         username: formData.name,
         email: formData.email,
         password: formData.password,
