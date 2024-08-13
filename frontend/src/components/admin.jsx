@@ -21,7 +21,7 @@ const Admin = () => {
   
         if (token) {
           
-         const response = await axios.get(`/admin/dashboard?token=${token}`);
+         const response = await axios.get(`/admins/admin/dashboard?token=${token}`);
          console.log(response)
           setIsAdmin(response.data.user.isAdmin)
         } 
@@ -42,7 +42,7 @@ const Admin = () => {
     if (token) {
       try {
         // Perform the logout request with the token in the body
-        await axios.get(`/logout?token=${token}`);
+        await axios.get(`admins/admin/logout?token=${token}`);
         // Clear the token cookie
         document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;';
 
