@@ -200,8 +200,8 @@ exports.forgotPassword = async (req, res) => {
         await user.save();
 
         // Construct reset link
-        const resetLink = `http://localhost:8080/Ecommerce/users/user/updatepassword/${token}`;
 
+        const resetLink = `http://localhost:5173/updatepassword/${token}`;      
         // Set up email options
         const mailOptions = {
             from: process.env.EMAIL_USER,
