@@ -35,7 +35,7 @@ exports.AdminIsLoggedIn = async (req, res, next) => {
 
     try {
         const user = await userModel.findOne({email : req.user.email});
-        if(! user.){
+        if(! user.isAdmin){
             return res.status(401).json({ success: false, message: ""})
         }
         const data = jwt.verify(token, secretKey);
