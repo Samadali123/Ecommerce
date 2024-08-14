@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const { config } = require('dotenv');
-const userModel = require("../models/user.model")
+
 
 config();
 
@@ -34,10 +34,8 @@ exports.AdminIsLoggedIn = async (req, res, next) => {
     }
 
     try {
-        const user = await userModel.findOne({email : req.user.email});
-        if(! user.isAdmin){
-            return res.status(401).json({ success: false, message: ""})
-        }
+       
+        
         const data = jwt.verify(token, secretKey);
         req.user = data;
         next();
