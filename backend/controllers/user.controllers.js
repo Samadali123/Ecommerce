@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const userModel = require('../models/user.model');
 const secretKey = process.env.JWT_SECRET_KEY;
 const crypto = require('crypto');
+
 const nodemailer = require('nodemailer');
 
 
@@ -242,13 +243,9 @@ exports.forgotPassword = async (req, res) => {
 
 
 exports.updatePassword = async (req, res) => {
-<<<<<<< HEAD
-    const { token } = req.body.token;
-    const { password, confirmPassword } = req.body;
-=======
-    
+
     const { password, confirmPassword, token } = req.body;
->>>>>>> 8a5ed25b325d7d01359f35cf033230f4f3294ee8
+
 
     try {
         if(! token){
@@ -324,8 +321,9 @@ exports.changePassword = async (req, res) => {
         if (!res.headersSent) {
             return res.status(500).json({ success: false, message: 'An error occurred. Please try again later.' });
         }
-    }-
+    }
 };
+
 
 
 
