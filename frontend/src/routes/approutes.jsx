@@ -13,6 +13,7 @@ import Loginadmin from '../components/loginadmin'
 import Registeradmin from '../components/registeradmin';
 import AddProduct from '../components/addProducts.jsx';
 import ForgotPassword from '../components/forgotpassword.jsx';
+import UpdatePassword from '../components/updatePassword.jsx'
 
 
 
@@ -30,6 +31,7 @@ const routes = () => {
             <Route path='/loginadmin' element={<Loginadmin/>}></Route>
             <Route path='/registeradmin' element={<Registeradmin/>}></Route>
             <Route path='/addproducts' element={<AddProduct/>}></Route>
+            <Route path='/updatepassword/:token' element={<UpdatePassword/>}></Route>
             <Route path='/forgotpassword' element={<ForgotPassword/>}></Route>
             <Route path="*" element={<NotFound/>}></Route>    
             </Routes>    

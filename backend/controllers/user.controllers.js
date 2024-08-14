@@ -206,7 +206,7 @@ exports.forgotPassword = async (req, res) => {
         const mailOptions = {
             from: process.env.EMAIL_USER,
             to: email,
-            subject: 'Password Reset Request',
+            subject: 'Password Reset',
             html: `
                 <html>
                 <body>
@@ -236,8 +236,8 @@ exports.forgotPassword = async (req, res) => {
 
 
 exports.updatePassword = async (req, res) => {
-    const { token } = req.params;
-    const { password, confirmPassword } = req.body;
+    
+    const { password, confirmPassword, token } = req.body;
 
     try {
         if(! token){
