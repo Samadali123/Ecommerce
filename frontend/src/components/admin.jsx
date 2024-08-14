@@ -71,7 +71,7 @@ const Admin = () => {
                 <a href="/admin/dashboard" className="hover:text-gray-400">Dashboard</a>
               </li>
               <li className="mb-4">
-                <a href="/admin/products" className="hover:text-gray-400">Products</a>
+                <a href="/addproducts" className="hover:text-gray-400">Products</a>
               </li>
               <li className="mb-4">
                 <a href="/admin/orders" className="hover:text-gray-400">Orders</a>
