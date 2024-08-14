@@ -1,7 +1,7 @@
 
 
 import React, { useContext, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate,Link } from 'react-router-dom';
 import axios from '../utils/axios';
 import Cookies from 'js-cookie';
 import AdminContext from '../contexts/admincontext';
@@ -116,6 +116,9 @@ const Loginadmin = () => {
               required
             />
           </div>
+          <Link to="/forgotpassword" className="text-blue-600 hover:text-blue-800 text-sm font-medium transition-colors duration-300">
+  Forgot Password?
+</Link>
           <button
             type="submit"
             className={`w-full p-3 rounded-lg font-semibold ${loading ? 'bg-gray-400' : 'bg-blue-600 text-white'}`}
