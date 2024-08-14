@@ -150,7 +150,7 @@ const Registeradmin = () => {
         <p className="mt-4 text-gray-600 text-center">
           Already have an account?{' '}
           <a
-            onClick={() => navigate('/login')}
+            onClick={() => navigate('/loginadmin')}
             className="text-blue-600 cursor-pointer"
           >
             Login
