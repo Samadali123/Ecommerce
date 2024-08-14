@@ -192,7 +192,8 @@ exports.forgotPassword = async (req, res) => {
 
         // Generate reset token and expiration
         const token = crypto.randomBytes(32).toString('hex');
-        const expireDate = Date.now() + 2 * 60 * 1000; // 2 minutes from now
+        const expireDate = Date.now() + 5 * 60 * 1000; // 5 minutes from now
+
 
         // Save reset token and expiration to user record
         user.resetPasswordToken = token;
@@ -218,7 +219,7 @@ exports.forgotPassword = async (req, res) => {
                     <p>Dear User,</p>
                     <p>We received a request to reset your Apnamart password. Please click the link below to reset your password:</p>
                     <p><a href="${resetLink}" style="color: #007bff; text-decoration: none; font-weight: bold;">Reset your password</a></p>
-                    <p>This link will expire in 2 minutes. If you did not request this change, please ignore this email.</p>
+                    <p>This link will expire in 5 minutes. If you did not request this change, please ignore this email.</p>
                     <p>Best regards,<br>Apnamart Support Team</p>
                     <a>${resetLink}</a>
                 </body>
