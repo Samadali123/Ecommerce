@@ -14,6 +14,7 @@ import Registeradmin from '../components/registeradmin';
 import AddProduct from '../components/addProducts.jsx';
 import ForgotPassword from '../components/forgotpassword.jsx';
 import UpdatePassword from '../components/updatePassword.jsx'
+import ResetPassword from '../components/resetpassword.jsx';
 
 
 
@@ -33,6 +34,7 @@ const routes = () => {
             <Route path='/addproducts' element={<AddProduct/>}></Route>
             <Route path='/updatepassword/:token' element={<UpdatePassword/>}></Route>
             <Route path='/forgotpassword' element={<ForgotPassword/>}></Route>
+            <Route path='/resetpassword' element={<ResetPassword/>}></Route>
             <Route path="*" element={<NotFound/>}></Route>    
             </Routes>    
     )
