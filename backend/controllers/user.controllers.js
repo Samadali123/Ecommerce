@@ -203,7 +203,7 @@ exports.forgotPassword = async (req, res) => {
 
         // Construct reset link
         const resetLink = `http://localhost:5173/updatepassword/${token}`; // Ensure this URL is correct
-
+         
         // Set up email options
         const mailOptions = {
             from: process.env.EMAIL_USER,
