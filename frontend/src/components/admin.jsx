@@ -6,7 +6,7 @@ import Loader from '../components/loader';
 import axios from '../utils/axios';
 import { toast } from 'react-toastify';
 import UserContext from '../contexts/usercontext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate,Link } from 'react-router-dom';
 
 const Admin = () => {
    const [isAdmin, setIsAdmin] = useState(false)
@@ -90,6 +90,12 @@ const Admin = () => {
         <main className="flex-1 p-8 bg-gray-100">
           <header className="flex justify-between items-center mb-8">
             <h1 className="text-3xl font-bold">Dashboard</h1>
+            <Link
+            to="/resetpassword"
+            className="ml-4 px-5 py-2 bg-yellow-500 text-white rounded-full font-semibold hover:bg-yellow-600 transition duration-300 shadow-lg"
+          >
+            Reset Password
+          </Link>
             <button  onClick={logout} className="bg-blue-600 text-white px-4 py-2 rounded-lg">Logout</button>
           </header>
           
