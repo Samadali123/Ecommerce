@@ -48,7 +48,7 @@ const Admin = () => {
 
         // Update the authentication state and navigate to the login page
         setadminIsAuthenticated(false);
-        navigate('/login');
+        navigate('/loginadmin');
       } catch (error) {
         console.error('Logout error:', error);
         toast.error('Error during logout. Please try again.');
