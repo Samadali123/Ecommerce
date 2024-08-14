@@ -10,7 +10,7 @@ const numberWithCommas = (number) => {
 exports.addProduct = async (req, res, next) => {
     try {
         const { name, description, price, category, stock, images, discount } = req.body;
-
+      
         // Check if all required fields are present
         if (!name || !description || !price || !category || !stock || !images || !discount) {
             return res.status(400).json({ success: false, message: "Please fill in all product details" });

@@ -1,5 +1,7 @@
 const jwt = require('jsonwebtoken');
 const { config } = require('dotenv');
+const userModel = require("../models/user.model")
+
 config();
 
 const secretKey = process.env.JWT_SECRET_KEY;
@@ -24,15 +26,18 @@ exports.UserIsLoggedIn = (req, res, next) => {
 }
 
 // Middleware to check if admin is logged in
-exports.AdminIsLoggedIn = (req, res, next) => {
+exports.AdminIsLoggedIn = async (req, res, next) => {
     // Check for token in query, cookies, body, or authorization header
     const token = req.query.token || req.cookies.token || req.body.token ;
-
     if (!token) {
         return res.status(401).json({ success: false, message: "You don't have a token. Please sign in to continue." });
     }
 
     try {
+        const user = await userModel.findOne({email : req.user.email});
+        if(! user.){
+            return res.status(401).json({ success: false, message: ""})
+        }
         const data = jwt.verify(token, secretKey);
         req.user = data;
         next();
