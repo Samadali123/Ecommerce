@@ -1,31 +1,77 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from '../utils/axios';
+import AccessDenied from './AccessDenied';
+
+import { toast } from 'react-toastify';
 
 const AddProduct = () => {
+  const [isAdmin, setIsAdmin] = useState(null)
+
+  
+  useEffect(() => {
+    const checkAdminStatus = async () => {
+      const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
+
+      if (token) {
+        try {
+          const response = await axios.get(`/admins/admin/dashboard?token=${token}`);
+          console.log(response);
+          setIsAdmin(response.data.user.isAdmin);
+        } catch (error) {
+          console.error('Error checking admin status:', error);
+          toast.error('Error verifying admin status.');
+        }
+      } else {
+        toast.error('User does not have a token.');
+      }
+    };
+
+    checkAdminStatus();
+  }, []);
   const [product, setProduct] = useState({
     name: '',
     description: '',
     price: '',
     category: '',
     stock: '',
-    images: null,
+    images: '',
     discount: '',
+  
   });
 
   const handleChange = (e) => {
-    const { name, value, files } = e.target;
+    const { name, value } = e.target;
     setProduct({
       ...product,
-      [name]: files ? files : value,
+      [name]: value,
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission logic here
-    console.log(product);
+    try {
+      // const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
+
+      const response = await axios.post(`/products/add?token=${token}`,product);
+      if (response.status === 200) {
+        alert('Product added successfully!');
+        setProduct({
+          name: '',
+          description: '',
+          price: '',
+          category: '',
+          stock: '',
+          images: '',
+          discount: '',
+        });
+      }
+    } catch (error) {
+      console.error('Error adding product:', error);
+      alert('Failed to add product. Please try again.');
+    }
   };
 
-  return (
+  return isAdmin ?  (
     <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md">
       <h2 className="text-2xl font-semibold mb-6">Add New Product</h2>
       <form onSubmit={handleSubmit}>
@@ -65,16 +111,28 @@ const AddProduct = () => {
         </div>
 
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">Category</label>
-          <input
-            type="text"
-            name="category"
-            value={product.category}
-            onChange={handleChange}
-            className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
-            required
-          />
-        </div>
+  <label className="block text-sm font-medium text-gray-700">Category</label>
+  <select
+    name="category"
+    value={product.category}
+    onChange={handleChange}
+    className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+    required
+  >
+    <option value="">Select a category</option>
+    <option value="electronics">Electronics</option>
+    <option value="clothing">Clothing</option>
+    <option value="home">Home</option>
+    <option value="beauty">Beauty</option>
+    <option value="sports">Sports</option>
+    <option value="toys">Toys</option>
+    <option value="footwear">Footwear</option>
+    <option value="cosmetics">Cosmetics</option>
+    <option value="mens">Men's</option>
+    <option value="womens">Women's</option>
+  </select>
+</div>
+
 
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700">Stock</label>
@@ -91,11 +149,11 @@ const AddProduct = () => {
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700">Images</label>
           <input
-            type="file"
+            type="text"
             name="images"
+            value={product.images}
             onChange={handleChange}
             className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
-            multiple
             required
           />
         </div>
@@ -121,7 +179,10 @@ const AddProduct = () => {
         </div>
       </form>
     </div>
-  );
+    ) : (
+      <AccessDenied />
+    )
+  
 };
 
 export default AddProduct;

@@ -21,4 +21,5 @@ router.delete("/product/delete/:id",AdminIsLoggedIn, deleteproduct);
 ///category
 router.get("/category", AdminIsLoggedIn,  productByCategory);
 
+
 module.exports = router
