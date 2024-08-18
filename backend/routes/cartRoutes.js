@@ -1,6 +1,6 @@
 const express = require('express');
 const { UserIsLoggedIn } = require('../middlewares/auth.middleware');
-const { addToCart, removeFromCart} = require('../controllers/cart.controllers');
+const { addToCart, removeFromCart, viewCart} = require('../controllers/cart.controllers');
 const router = express.Router();
 
 
@@ -9,6 +9,9 @@ router.post("/add", UserIsLoggedIn, addToCart);
 
 // /remove
 router.put("/remove", UserIsLoggedIn, removeFromCart);
+
+// /cart/view
+router.get("/view",UserIsLoggedIn, viewCart )
 
 
 module.exports = router

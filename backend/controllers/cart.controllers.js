@@ -103,6 +103,19 @@ exports.removeFromCart = async (req, res, next) => {
 };
 
 
+exports.viewCart = async (req, res, next)=>{
+    try {
+         const loginuser = await userModel.findOne({email : req.user.email}).populate("mycart");
+         if(! loginuser) {
+            return res.status(401).json({success : false, message : "Login user not found"})
+         }
+         res.status(200).json({success :false , loginuser});
+         
+    } catch (error) {
+         res.status(error.status).json({success : false , message : error.message})
+    }
+}
+
 
 
 
