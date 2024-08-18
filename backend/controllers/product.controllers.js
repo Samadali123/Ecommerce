@@ -228,3 +228,23 @@ exports.deleteproduct = async (req, res, next) => {
         res.status(500).json({ success: false, message: "Internal Server Error" });
     }
 };
+
+
+exports.productByCategory = async (req, res, next) => {
+    try {
+    
+        const category = (req.query.category || req.body.category)?.toLowerCase();
+        if (!category) {
+            return res.status(400).json({ success: false, message: 'Category is required' });
+        }
+
+        const products = await productModel.find({ category });
+        if (products.length === 0) {
+            return res.status(404).json({ success: false, message: 'No products found for this category' });
+        }
+        res.status(200).json({ success: true, products });
+    } catch (error) {
+        console.error('Error retrieving products by category:', error);
+        res.status(error.status || 500).json({ success: false, message: 'Internal Server Error' });
+    }
+};
