@@ -27,7 +27,7 @@ const productSchema = new Schema({
         type: String,
         required: true,
         enum: {
-            values: ['electronics', 'clothing', 'home', 'beauty', 'sports', 'toys', 'footwear', 'cosmetics', 'mens', 'womens'],
+            values: ['electronics', 'clothing', 'home', 'sports', 'kids', 'footwear', 'cosmetics', 'mens', 'womens'],
             message: 'Category is not valid'
         }
     },
@@ -41,7 +41,8 @@ const productSchema = new Schema({
         type: Number,
         min: [0, 'Discount must be between 0 and 100'],
         max: [100, 'Discount must be between 0 and 100']
-    }
+    },
+
 }, { timestamps: true });
 
 // Pre-save hook to normalize the category to lowercase and calculate price after discount
