@@ -111,7 +111,7 @@ exports.singleproduct = async (req, res, next) => {
    
     try {
         // Extract product ID from request parameters
-        const productId = req.params.id;
+        const productId = req.params.id || req.query.id;
 
         // Fetch the product by ID
         const product = await productModel.findById(productId).exec();
@@ -149,7 +149,7 @@ exports.updateproduct = async (req, res, next) => {
 
     try {
         // Extract product ID from request parameters
-        const productId = req.params.id;
+        const productId = req.params.id || req.query.productId;
         const updates = req.body;
 
         // Check if the product ID is valid and provided
