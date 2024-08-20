@@ -103,15 +103,16 @@ exports.totalproducts = async (req, res, next) => {
 };
 
 
+
 exports.singleproduct = async (req, res, next) => {
     // Function to format numbers with commas
     const numberWithCommas = (number) => {
         return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     };
-   
+
     try {
         // Extract product ID from request parameters
-        const productId = req.params.id;
+        const productId = req.params.id || req.query.id;
 
         // Fetch the product by ID
         const product = await productModel.findById(productId).exec();
@@ -121,17 +122,31 @@ exports.singleproduct = async (req, res, next) => {
             return res.status(404).json({ success: false, message: "Product not found" });
         }
 
-        // Format prices with commas
+        // Find similar products in the same category
+        const similarProducts = await productModel.find({
+            category: product.category,
+            _id: { $ne: productId } // Exclude the current product
+        }).limit(10); // Limit the number of similar products to 5 for example
+
+        // Format prices with commas for the single product
         const formattedProduct = {
             ...product.toObject(),
             price: numberWithCommas(product.price),
             priceAfterDiscount: product.priceAfterDiscount ? numberWithCommas(product.priceAfterDiscount) : undefined
         };
 
+        // Format prices with commas for similar products
+        const formattedSimilarProducts = similarProducts.map(item => ({
+            ...item.toObject(),
+            price: numberWithCommas(item.price),
+            priceAfterDiscount: item.priceAfterDiscount ? numberWithCommas(item.priceAfterDiscount) : undefined
+        }));
+
         // Send the response
         res.status(200).json({
             success: true,
-            product: formattedProduct
+            product: formattedProduct,
+            similarProducts: formattedSimilarProducts
         });
 
     } catch (error) {
@@ -139,6 +154,7 @@ exports.singleproduct = async (req, res, next) => {
         res.status(500).json({ success: false, message: "Internal Server Error" });
     }
 };
+
 
 
 
@@ -257,16 +273,14 @@ exports.updateProduct = async (req, res, next) => {
 exports.productByCategory = async (req, res, next) => {
     try {
         const category = req.query.category || req.params.category ?.toLowerCase();
-
         if (!category) {
             return res.status(400).json({ success: false, message: 'Category is required' });
         }
-
+        
         const products = await productModel.find({ category });
         if (products.length === 0) {
             return res.status(404).json({ success: false, message: 'No products found for this category' });
         }
-
         res.status(200).json({ success: true, products });
     } catch (error) {
         res.status(error.status || 500).json({ success: false, message: error.message });

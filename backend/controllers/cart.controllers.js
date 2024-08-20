@@ -6,15 +6,11 @@ const userModel = require('../models/user.model');
 exports.addToCart = async (req, res, next) => {
     try {
         const userId = req.user.userid; // Assuming user is authenticated and req.user.userid is available
-        const { productId, quantity, address } = req.body;
+        const { productId } = req.body;
 
-        if (quantity <= 0) {
-            return res.status(400).json({ success: false, message: 'Quantity must be greater than 0' });
-        }
-
-        // Validate address
-        if (!address || !address.street || !address.city || !address.state || !address.postalCode || !address.country) {
-            return res.status(400).json({ success: false, message: 'Address information is required' });
+        // Check if the product ID is provided
+        if (!productId) {
+            return res.status(400).json({ success: false, message: 'Product ID is required' });
         }
 
         // Check if the product exists
@@ -26,23 +22,18 @@ exports.addToCart = async (req, res, next) => {
         // Find the user's cart or create a new one if it doesn't exist
         let cart = await cartModel.findOne({ user: userId });
         if (!cart) {
-            cart = new cartModel({ user: userId, items: [], address });
+            cart = new cartModel({ user: userId, items: [] });
         }
 
         // Check if the product is already in the cart
         const cartItemIndex = cart.items.findIndex(item => item.product.toString() === productId);
 
         if (cartItemIndex > -1) {
-            // If the product is already in the cart, update the quantity
-            cart.items[cartItemIndex].quantity += quantity;
+            // If the product is already in the cart, increment the quantity
+            cart.items[cartItemIndex].quantity += 1;
         } else {
-            // If the product is not in the cart, add it as a new item
-            cart.items.push({ product: productId, quantity });
-        }
-
-        // Update address if it has changed
-        if (cart.address.toString() !== address.toString()) {
-            cart.address = address;
+            // If the product is not in the cart, add it as a new item with quantity 1
+            cart.items.push({ product: productId, quantity: 1 });
         }
 
         // Save the cart
@@ -57,6 +48,7 @@ exports.addToCart = async (req, res, next) => {
         res.status(error.status || 500).json({ success: false, message: error.message });
     }
 };
+
 
 
 
