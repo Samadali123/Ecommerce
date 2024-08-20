@@ -7,10 +7,17 @@ import axios from '../utils/axios';
 import { toast } from 'react-toastify';
 import Cookies from 'js-cookie'; // Import js-cookie
 import AdminContext from '../contexts/admincontext';
+import { GoogleLogin } from '@react-oauth/google';
+
+import 'react-toastify/dist/ReactToastify.css';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import Header from './Header';
+import Header2 from './header2';
 
 
 const Registeradmin = () => {
- 
+  
+  
   const [adminisAuthenticated, setadminIsAuthenticated] = useContext(AdminContext);
 
   const navigate = useNavigate();
@@ -23,6 +30,11 @@ const Registeradmin = () => {
   });
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
+  const toggleConfirmPasswordVisibility = () => setShowConfirmPassword((prev) => !prev);
+
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -73,91 +85,150 @@ const Registeradmin = () => {
       setLoading(false);
     }
   };
+  const handleGoogleLoginSuccess = async (credentialResponse) => {
+    try {
+      const data = jwtDecode(credentialResponse.credential);
+      const response = await axios.post('/users/user/google/login', {
+        username: data.name,
+        email: data.email,
+        isAdmin: false,
+      });
+
+      console.log('Google login successful:', response.data);
+
+      Cookies.set('token', response.data.token, { expires: 1 / 24 });
+      setIsAuthenticated(true);
+      navigate('/');
+    } catch (error) {
+      console.error('Error during Google login:', error);
+      setError('Google login failed. Please try again.');
+    }
+  };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
-        <h1 className="text-2xl font-bold mb-6">Register Admin</h1>
-        <form onSubmit={handleSubmit}>
-          {error && <p className="text-red-600 mb-4">{error}</p>}
-          <div className="mb-4">
-            <label htmlFor="name" className="block text-gray-700 mb-2">Username</label>
+    <>
+    <Header2/>
+    <div className="flex items-center justify-center min-h-screen bg-gray-100 px-4">
+      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+        <h2 className="text-2xl font-bold text-blue-700 mb-6 text-left">Register Account</h2>
+        <form className="space-y-4" onSubmit={handleSubmit}>
+          <div>
+            <label htmlFor="username" className="block text-sm font-semibold text-gray-700 mb-2">Username</label>
             <input
               type="text"
-              name="name"
-              id="name"
-              value={formData.name}
+              id="username"
+              name="username"
+              value={formData.username}
               onChange={handleChange}
-              className="w-full p-3 border border-gray-300 rounded-lg"
-              required
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Enter your username"
+              disabled={loading}
             />
           </div>
-          <div className="mb-4">
-            <label htmlFor="email" className="block text-gray-700 mb-2">Email</label>
+          <div>
+            <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">Email Address</label>
             <input
               type="email"
-              name="email"
               id="email"
+              name="email"
               value={formData.email}
               onChange={handleChange}
-              className="w-full p-3 border border-gray-300 rounded-lg"
-              required
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="example@domain.com"
+              disabled={loading}
             />
           </div>
-          <div className="mb-4">
-            <label htmlFor="password" className="block text-gray-700 mb-2">Password</label>
+          <div className="relative">
+            <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">Password</label>
             <input
-              type="password"
-              name="password"
+              type={showPassword ? 'text' : 'password'}
               id="password"
+              name="password"
               value={formData.password}
               onChange={handleChange}
-              className="w-full p-3 border border-gray-300 rounded-lg"
-              required
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
+              placeholder="••••••••"
+              disabled={loading}
             />
+            <button
+              type="button"
+              onClick={togglePasswordVisibility}
+              className="absolute inset-y-0 mt-8 right-0 flex items-center px-3 text-gray-500 focus:outline-none"
+              disabled={loading}
+            >
+              {showPassword ? <FaEyeSlash /> : <FaEye />}
+            </button>
           </div>
-          <div className="mb-4">
-            <label htmlFor="confirmPassword" className="block text-gray-700 mb-2">Confirm Password</label>
+          <div className="relative">
+            <label htmlFor="confirmPassword" className="block text-sm font-semibold text-gray-700 mb-2">Confirm Password</label>
             <input
-              type="password"
-              name="confirmPassword"
+              type={showConfirmPassword ? 'text' : 'password'}
               id="confirmPassword"
+              name="confirmPassword"
               value={formData.confirmPassword}
               onChange={handleChange}
-              className="w-full p-3 border border-gray-300 rounded-lg"
-              required
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
+              placeholder="••••••••"
+              disabled={loading}
             />
+            <button
+              type="button"
+              onClick={toggleConfirmPasswordVisibility}
+              className="absolute inset-y-0 mt-8 right-0 flex items-center px-3 text-gray-500 focus:outline-none"
+              disabled={loading}
+            >
+              {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+            </button>
           </div>
-          {/* <div className="mb-4 flex items-center gap-3">
-            <label htmlFor="isAdmin" className="block text-gray-700 mb-2">Register as Admin</label>
-            <input
-              type="checkbox"
-              name="isAdmin"
-              id="isAdmin"
-              checked={formData.isAdmin}
-              onChange={handleChange}
-              className="w-5 h-5"
-            />
-          </div> */}
+          
           <button
             type="submit"
-            className={`w-full p-3 rounded-lg font-semibold ${loading ? 'bg-gray-400' : 'bg-blue-600 text-white'}`}
+            className="w-full py-3 bg-blue-700 text-white rounded-lg mt-4 flex items-center justify-center transition-colors duration-300 ease-in-out hover:bg-blue-900"
             disabled={loading}
           >
-            {loading ? 'Registering...' : 'Register'}
+            {loading ? (
+              <svg
+                className="animate-spin mr-2 h-5 w-5 text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                ></path>
+              </svg>
+            ) : (
+              'Register'
+            )}
           </button>
         </form>
-        <p className="mt-4 text-gray-600 text-center">
-          Already have an account?{' '}
-          <a
-            onClick={() => navigate('/loginadmin')}
-            className="text-blue-600 cursor-pointer"
-          >
-            Login
-          </a>
-        </p>
+        <div className="flex items-center justify-between mt-4">
+          <hr className="w-full border-gray-300" />
+          <span className="text-gray-500 px-4">or</span>
+          <hr className="w-full border-gray-300" />
+        </div>
+        <GoogleLogin
+          className="w-full mt-4 py-3 bg-red-500 text-white rounded-lg hover:bg-red-700 flex items-center justify-center"
+          onSuccess={handleGoogleLoginSuccess}
+          onError={() => {
+            console.log('Login Failed');
+            setError('Google login failed. Please try again.');
+          }}
+        />
       </div>
     </div>
+    </>
+
   );
 };
 

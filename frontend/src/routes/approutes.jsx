@@ -15,6 +15,11 @@ import AddProduct from '../components/addProducts.jsx';
 import ForgotPassword from '../components/forgotpassword.jsx';
 import UpdatePassword from '../components/updatePassword.jsx'
 import ResetPassword from '../components/resetpassword.jsx';
+import ProductsPage from '../components/productsPage.jsx';
+import Productsforuser from '../components/productsforuser.jsx';
+import Updateproduct from '../components/updateproduct.jsx';
+import Reg from '../components/reg.jsx';
+import Shop from '../components/reg.jsx';
 
 
 
@@ -35,6 +40,10 @@ const routes = () => {
             <Route path='/updatepassword/:token' element={<UpdatePassword/>}></Route>
             <Route path='/forgotpassword' element={<ForgotPassword/>}></Route>
             <Route path='/resetpassword' element={<ResetPassword/>}></Route>
+            <Route path='/products' element={<ProductsPage/>}></Route>
+            <Route path='/productsforuser' element={<Productsforuser/>}></Route>
+            <Route path='/updateproduct/:productId' element={<Updateproduct/>}></Route>
+            <Route path='/reg' element={<Shop/>}></Route>
             <Route path="*" element={<NotFound/>}></Route>    
             </Routes>    
     )
