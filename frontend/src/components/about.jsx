@@ -4,13 +4,18 @@
 import React, { useContext } from 'react';
 import IsLoggedIn from '../components/isloggedin';
 import UserContext from '../contexts/usercontext';
+import Header from './Header';
 
 const AboutUs = () => {
   const [isAuthenticated, setIsAuthenticated] = useContext(UserContext);
   
 
   return (
+    
     isAuthenticated ? (
+      <>
+      <Header/>
+      
       <div className="about-us bg-gray-100 text-gray-900 py-16 px-4 md:px-8">
         {/* Hero Section */}
         <section className="text-center mb-12">
@@ -75,10 +80,10 @@ const AboutUs = () => {
           </div>
         </section>
       </div>
-    ) : (
+      </>) : (
       <IsLoggedIn />
     )
-  );
+     ); 
   
 };
 

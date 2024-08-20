@@ -141,7 +141,7 @@ exports.singleproduct = async (req, res, next) => {
 };
 
 
-<<<<<<< HEAD
+
 exports.updateproduct = async (req, res, next) => {
     // Function to format numbers with commas
     const numberWithCommas = (number) => {
@@ -203,8 +203,6 @@ exports.updateproduct = async (req, res, next) => {
     }
 };
 
-=======
->>>>>>> f21d3f319b815f8fc0bd585caef8a48d42a2ec7f
 
 exports.deleteproduct = async (req, res, next) => {
     try {
@@ -320,19 +318,26 @@ exports.updateProduct = async (req, res, next) => {
 
 exports.productByCategory = async (req, res, next) => {
     try {
-        const category = req.query.category || req.params.category ?.toLowerCase();
+        // Retrieve category from query parameters or URL parameters
+        let category = req.query.category || req.params.category;
+        category = category.toLowerCase();
+        
 
         if (!category) {
             return res.status(400).json({ success: false, message: 'Category is required' });
         }
+        
+        // Find products by category, ensuring that category matches exactly
+        const products = await productModel.find({ category: category });
 
-        const products = await productModel.find({ category });
         if (products.length === 0) {
+            console.log('Category:', category); // Debugging
             return res.status(404).json({ success: false, message: 'No products found for this category' });
         }
 
         res.status(200).json({ success: true, products });
     } catch (error) {
+        console.error('Error fetching products:', error); // Debugging
         res.status(error.status || 500).json({ success: false, message: error.message });
     }
 };

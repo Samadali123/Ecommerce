@@ -3,6 +3,8 @@ import axios from '../utils/axios';
 import { toast } from 'react-toastify';
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
+import Header from './Header';
+import Header2 from './header2';
 
 const ProductsPage = () => {
   const [products, setProducts] = useState([]);
@@ -52,6 +54,8 @@ const ProductsPage = () => {
   if (error) return <div>Error: {error}</div>;
 
   return (
+    <>
+    <Header2/>
     <div className="products-page p-4">
       <h1 className="text-3xl font-bold text-center mb-8">Our Products</h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
@@ -92,6 +96,7 @@ const ProductsPage = () => {
         ))}
       </div>
     </div>
+    </>
   );
 };
 

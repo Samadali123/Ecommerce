@@ -7,10 +7,10 @@ const { AdminIsLoggedIn } = require('../middlewares/auth.middleware');
 router.post("/add", AdminIsLoggedIn, addProduct);
 
 // /all
-router.get("/all", AdminIsLoggedIn, totalproducts);
+router.get("/all", totalproducts);
 
 // /product/:id
-router.get("/product/:id", AdminIsLoggedIn, singleproduct);
+router.get("/product/:id", singleproduct);
 
 // /product/update/:id
 router.put("/product/update/:productId", AdminIsLoggedIn, updateProduct);
@@ -19,7 +19,7 @@ router.put("/product/update/:productId", AdminIsLoggedIn, updateProduct);
 router.delete("/product/delete/:id",AdminIsLoggedIn, deleteproduct);
 
 ///category
-router.get("/category", AdminIsLoggedIn,  productByCategory);
+router.get("/category",  productByCategory);
 
 
 module.exports = router

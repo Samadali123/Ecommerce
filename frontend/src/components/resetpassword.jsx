@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from '../utils/axios'; // Adjust the path as needed
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import Header2 from './header2';
 
 const ResetPassword = () => {
   const [currentPassword, setCurrentPassword] = useState('');
@@ -40,6 +41,8 @@ const ResetPassword = () => {
   };
 
   return (
+    <>
+    <Header2/>
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
       <div className="w-full max-w-md p-8 bg-white shadow-lg rounded-lg">
         <h2 className="text-2xl font-semibold mb-6 text-gray-800">Reset Password</h2>
@@ -86,6 +89,7 @@ const ResetPassword = () => {
         </form>
       </div>
     </div>
+    </>
   );
 };
 

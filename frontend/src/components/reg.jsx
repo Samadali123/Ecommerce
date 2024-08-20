@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
 import axios from '../utils/axios';
 import { LuListFilter } from 'react-icons/lu';
 import Header2 from '../components/header2';
@@ -8,62 +7,50 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 
-const getRandomColor = () => {
-    const letters = '0123456789ABCDEF';
-    let color = '#';
-    for (let i = 0; i < 6; i++) {
-        color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
-};
-
+// Mock data for categories
 const categories = [
     "All", "Electronics", "Clothing", "Home", "Sports", 
     "Kids", "Footwears", "Cosmetics", "Mens", "Womens"
 ];
 
-const Productsforuser = () => {
-    const location = useLocation();
-    const navigate = useNavigate();
-    const query = new URLSearchParams(location.search);
-    const initialCategory = query.get('category') || "All"; // Get category from query params or default to "All"
-    
-    const [selectedCategory, setSelectedCategory] = useState(initialCategory);
+const Shop = () => {
+    const [selectedCategory, setSelectedCategory] = useState("All");
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
-    const [error, setError] = useState(null);
     const dropdownRef = useRef(null);
     const dropdownTriggerRef = useRef(null);
 
+    // Fetch products from API
     useEffect(() => {
-        const fetchProducts = async (category) => {
-            const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
-
+        const fetchProducts = async () => {
             try {
-                const endpoint = category === "All" ? `/products/all` : `/products/category?category=${category}`;
-                const response = await axios.get(endpoint);
-                setProducts(response.data.products);
+                const response = await axios.get('https://fakestoreapi.com/products');
+                const productsWithDiscounts = response.data.map(product => ({
+                    ...product,
+                    discount: Math.floor(Math.random() * 30) // Random discount between 0 and 29
+                }));
+                setProducts(productsWithDiscounts);
+                setLoading(false);
             } catch (error) {
                 console.error('Error fetching products:', error);
-                setError('Failed to load products.');
-                toast.error('Error fetching products.');
-            } finally {
                 setLoading(false);
             }
         };
 
-        fetchProducts(selectedCategory);
-    }, [selectedCategory]);
+        fetchProducts();
+    }, []);
+
+    // Filter products based on selected category
+    const filteredProducts = selectedCategory === "All" ? products : products.filter(product => product.category === selectedCategory);
 
     // Handle category selection
     const handleCategorySelect = (category) => {
         setSelectedCategory(category);
-        navigate(`/productsforuser?category=${category}`); // Update URL with selected category
         setDropdownOpen(false);
-        setSelectedProduct(null);
+        setSelectedProduct(null); // Hide the product detail modal
     };
 
     // Handle Add to Cart
@@ -146,7 +133,7 @@ const Productsforuser = () => {
             {/* Product Grid */}
             <main className="flex-1 p-4 lg:p-8">
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                    {products.map(product => (
+                    {filteredProducts.map(product => (
                         <div 
                             key={product.id} 
                             className="bg-white p-4 rounded-lg shadow-md border border-gray-300 hover:border-blue-500 hover:shadow-lg transition-all duration-300 cursor-pointer" 
@@ -155,15 +142,15 @@ const Productsforuser = () => {
                                 setCurrentImageIndex(0); // Reset image index on new product selection
                             }}
                         >
-                            <img src={product.images[0]} alt={product.name} className="w-full h-56 flex justify-center  items-center overflow-hidden rounded-t-lg" />
-                            <h3 className="text-lg font-semibold mb-2">{product.name}</h3>
+                            <img src={product.image} alt={product.title} className="w-full h-48 object-cover rounded-lg mb-4" />
+                            <h3 className="text-lg font-semibold mb-2">{product.title}</h3>
                             <p className="text-gray-600 mb-2">
-                              <p className='line-through'>{product.price}</p>
-                                {product.discount > 0 && (
-                                    <p className="text-sm text-red-500 mb-1">{product.discount}% Off</p>
-                                )}
+                                ${product.price} 
+                                <span className="text-red-500 line-through ml-2">
+                                    ${(product.price / (1 - product.discount / 100)).toFixed(2)}
+                                </span>
                             </p>
-                            <p className="text-gray-800 text-xl font-bold">{product.priceAfterDiscount}</p>
+                            <p className="text-gray-500">{product.discount}% Off</p>
                             <button className="bg-blue-700 text-white py-1 px-3 rounded-lg mt-2 hover:bg-blue-900 transition duration-300">
                                 View Product
                             </button>
@@ -203,41 +190,44 @@ const Productsforuser = () => {
                                     {selectedProduct.images && selectedProduct.images.length > 0 ? (
                                         <img 
                                             src={selectedProduct.images[currentImageIndex]} 
-                                            alt={selectedProduct.name} 
-                                            className="w-full h-48 flex justify-center items-center overflow-hidden rounded-t-lg"
+                                            alt={selectedProduct.title} 
+                                            className="w-full h-full object-cover"
                                         />
                                     ) : (
                                         <img 
                                             src={selectedProduct.image} 
-                                            alt={selectedProduct.name} 
-                                            className="w-full h-48 flex justify-center items-center overflow-hidden rounded-t-lg"
+                                            alt={selectedProduct.title} 
+                                            className="w-full h-full object-cover"
                                         />
                                     )}
                                 </div>
                             </div>
-
-                            {/* Product Details */}
-                            <div className="lg:w-1/2 lg:pl-6 mt-4 lg:mt-0">
-                                <h2 className="text-2xl font-semibold mb-4">{selectedProduct.name}</h2>
-                                <p className="text-lg font-bold text-blue-700">${selectedProduct.price}</p>
-                                <p className="text-gray-600 mt-2">{selectedProduct.description}</p>
-                                <div className="mt-4">
-                                    <button 
-                                        onClick={handleAddToCart} 
-                                        className="bg-blue-700 text-white py-2 px-4 rounded-lg hover:bg-blue-900 transition duration-300"
-                                    >
-                                        Add to Cart
-                                    </button>
-                                </div>
+                            <div className="lg:w-1/2 lg:pl-4 mt-4 lg:mt-0">
+                                <h2 className="text-2xl font-semibold mb-4">{selectedProduct.title}</h2>
+                                <p className="text-gray-800 mb-4">{selectedProduct.description}</p>
+                                <p className="text-gray-600 mb-4">
+                                    Price: ${selectedProduct.price} 
+                                    <span className="text-red-500 line-through ml-2">
+                                        ${(selectedProduct.price / (1 - selectedProduct.discount / 100)).toFixed(2)}
+                                    </span>
+                                    <span className="text-green-600 ml-2">{selectedProduct.discount}% Off</span>
+                                </p>
+                                <button 
+                                    className="bg-blue-700 text-white py-2 px-4 rounded-lg hover:bg-blue-900 transition duration-300"
+                                    onClick={handleAddToCart}
+                                >
+                                    Add to Cart
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
             )}
 
-            <ToastContainer />
+            {/* Toast Notification */}
+            <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
         </div>
     );
 };
 
-export default Productsforuser;
+export default Shop;

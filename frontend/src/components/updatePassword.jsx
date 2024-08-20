@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import axios from '../utils/axios'; // Adjust the import path as needed
 import { useParams } from 'react-router-dom';
+import Header from './Header';
+import Header2 from './header2';
 
 const UpdatePassword = () => {
   const { token } = useParams(); // Extract the token from the URL
@@ -33,6 +35,8 @@ const UpdatePassword = () => {
   };
 
   return (
+    <>
+    <Header2/>
     <div className="flex justify-center items-center h-screen bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
         <h2 className="text-2xl font-bold mb-6 text-center">Update Password</h2>
@@ -70,6 +74,7 @@ const UpdatePassword = () => {
         </form>
       </div>
     </div>
+    </>
   );
 };
 
