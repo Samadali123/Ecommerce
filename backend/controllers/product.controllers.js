@@ -103,14 +103,15 @@ exports.totalproducts = async (req, res, next) => {
 };
 
 
+
 exports.singleproduct = async (req, res, next) => {
     // Function to format numbers with commas
     const numberWithCommas = (number) => {
         return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     };
-   
+
     try {
-        // Extract product ID from request parameters
+        // Extract product ID from request parameters or query
         const productId = req.params.id || req.query.id;
 
         // Fetch the product by ID
@@ -121,24 +122,61 @@ exports.singleproduct = async (req, res, next) => {
             return res.status(404).json({ success: false, message: "Product not found" });
         }
 
-        // Format prices with commas
+        // Find similar products in the same category
+        let similarProducts = await productModel.find({
+            category: product.category,
+            _id: { $ne: productId } // Exclude the current product
+        }).limit(10).lean(); // Using .lean() to return plain JavaScript objects
+
+        let responseProducts = [];
+
+        // If similar products are found, set them as similarProducts
+        if (similarProducts.length > 0) {
+            responseProducts = similarProducts.map(item => ({
+                ...item,
+                price: numberWithCommas(item.price),
+                priceAfterDiscount: item.priceAfterDiscount ? numberWithCommas(item.priceAfterDiscount) : undefined
+            }));
+        } else {
+            // If no similar products are found, fetch random products
+            const moreProducts = await productModel.aggregate([
+                { $match: { _id: { $ne: productId } } }, // Exclude the current product
+                { $sample: { size: 20 } } // Get up to 20 random products
+            ]);
+
+            responseProducts = moreProducts.map(item => ({
+                ...item,
+                price: numberWithCommas(item.price),
+                priceAfterDiscount: item.priceAfterDiscount ? numberWithCommas(item.priceAfterDiscount) : undefined
+            }));
+        }
+
+        // Format the single product
         const formattedProduct = {
             ...product.toObject(),
             price: numberWithCommas(product.price),
             priceAfterDiscount: product.priceAfterDiscount ? numberWithCommas(product.priceAfterDiscount) : undefined
         };
 
-        // Send the response
-        res.status(200).json({
+        // Prepare the response JSON structure
+        const response = {
             success: true,
-            product: formattedProduct
-        });
+            product: formattedProduct,
+            similarProducts: similarProducts.length > 0 ? responseProducts : undefined,
+            moreProducts: similarProducts.length === 0 ? responseProducts : undefined
+        };
+
+        // Send the response
+        res.status(200).json(response);
 
     } catch (error) {
         console.error('Error fetching product:', error);
         res.status(500).json({ success: false, message: "Internal Server Error" });
     }
 };
+
+
+
 
 
 
@@ -339,5 +377,43 @@ exports.productByCategory = async (req, res, next) => {
     } catch (error) {
         console.error('Error fetching products:', error); // Debugging
         res.status(error.status || 500).json({ success: false, message: error.message });
+    }
+};
+
+
+
+
+exports.searchProducts = async (req, res, next) => {
+    try {
+        const { query } = req.query; // Retrieve the search query from the request
+
+        // Check if the query parameter is provided
+        if (!query) {
+            return res.status(400).json({ success: false, message: 'Query is required' });
+        }
+
+        // Create a case-insensitive regex pattern for matching the query
+        const regexPattern = new RegExp(query, 'i');
+
+        // Find products that match the query in title, category, or any other fields
+        const products = await productModel.find({
+            $or: [
+                { name: { $regex: regexPattern } },
+                { category: { $regex: regexPattern } },
+                { description: { $regex: regexPattern } },
+                // Add other fields you want to search here
+            ]
+        }).lean(); // Use .lean() to return plain JavaScript objects for better performance
+
+        // Check if no products were found
+        if (products.length === 0) {
+            return res.status(404).json({ success: false, message: 'No products found' });
+        }
+
+        // Send the response with found products
+        res.status(200).json({ success: true, products });
+    } catch (error) {
+        console.error('Error in searchProducts:', error);
+        res.status(500).json({ success: false, message: 'Server error' });
     }
 };

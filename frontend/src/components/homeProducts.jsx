@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from '../utils/axios';
 import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 const getRandomColor = () => {
     const letters = '0123456789ABCDEF';
@@ -11,17 +13,22 @@ const getRandomColor = () => {
     return color;
 };
 
+
 const Homeproduct = () => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [hoveredIndex, setHoveredIndex] = useState(null);
     const [buttonStyles, setButtonStyles] = useState({});
+    const navigate = useNavigate();
+    const handleViewProductClick = (productId) => {
+        navigate(`/singleproduct/${productId}`);
+    };
 
     useEffect(() => {
         const fetchProducts = async () => {
             const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
-    
+
             if (token || !token) {
                 try {
                     const response = await axios.get(`/products/all?token=${token}`);
@@ -38,7 +45,7 @@ const Homeproduct = () => {
                 toast.error('User does not have a token.');
             }
         };
-    
+
         fetchProducts();
     }, []);
 
@@ -89,17 +96,20 @@ const Homeproduct = () => {
                                     <p className="text-xs text-red-500 line-through">{`₹${product.price}`}</p>
                                 </div>
                                 <p className="text-xs text-gray-500 mt-1">{`${product.discount}% Off`}</p>
-                                <button
-                                    onMouseEnter={() => handleMouseEnter(index)}
-                                    onMouseLeave={handleMouseLeave}
-                                    className={`mt-4 w-full px-3 py-1 border rounded transition-colors duration-300 ease-in-out`}
-                                    style={{
-                                        borderColor: hoveredIndex === index ? buttonStyles[index]?.borderColor : 'blue',
-                                        color: hoveredIndex === index ? buttonStyles[index]?.color : 'blue',
-                                    }}
-                                >
-                                    View Product
-                                </button>
+                                <Link to={`/singleproduct/${product._id}`}>
+                                    <button
+                                        onClick={() => handleViewProductClick(product.id)} // Pass the product id here
+                                        onMouseEnter={() => handleMouseEnter(index)}
+                                        onMouseLeave={handleMouseLeave}
+                                        className="mt-4 w-full px-3 py-1 border rounded transition-colors duration-300 ease-in-out"
+                                        style={{
+                                            borderColor: hoveredIndex === index ? buttonStyles[index]?.borderColor : 'blue',
+                                            color: hoveredIndex === index ? buttonStyles[index]?.color : 'blue',
+                                        }}
+                                    >
+                                        View Product
+                                    </button>
+                                </Link>
                             </div>
                         </div>
                     ))}

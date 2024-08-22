@@ -20,6 +20,7 @@ import Productsforuser from '../components/productsforuser.jsx';
 import Updateproduct from '../components/updateproduct.jsx';
 import Reg from '../components/reg.jsx';
 import Shop from '../components/reg.jsx';
+import SingleProduct from '../components/SingleProduct.jsx';
 
 
 
@@ -43,6 +44,7 @@ const routes = () => {
             <Route path='/products' element={<ProductsPage/>}></Route>
             <Route path='/productsforuser' element={<Productsforuser/>}></Route>
             <Route path='/updateproduct/:productId' element={<Updateproduct/>}></Route>
+            <Route path='/singleproduct/:id' element={<SingleProduct/>}></Route>
             <Route path='/reg' element={<Shop/>}></Route>
             <Route path="*" element={<NotFound/>}></Route>    
             </Routes>    
