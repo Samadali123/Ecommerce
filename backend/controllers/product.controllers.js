@@ -104,6 +104,10 @@ exports.totalproducts = async (req, res, next) => {
 
 
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 94a67aae45f0ce69d7345b8225d5d62d992c0856
 exports.singleproduct = async (req, res, next) => {
     // Function to format numbers with commas
     const numberWithCommas = (number) => {
@@ -269,9 +273,6 @@ exports.deleteproduct = async (req, res, next) => {
 };
 
 
-
-
-
 exports.updateProduct = async (req, res, next) => {
     try {
 
@@ -356,11 +357,10 @@ exports.updateProduct = async (req, res, next) => {
 
 exports.productByCategory = async (req, res, next) => {
     try {
-        // Retrieve category from query parameters or URL parameters
+
         let category = req.query.category || req.params.category;
         category = category.toLowerCase();
         
-
         if (!category) {
             return res.status(400).json({ success: false, message: 'Category is required' });
         }
@@ -368,11 +368,11 @@ exports.productByCategory = async (req, res, next) => {
         // Find products by category, ensuring that category matches exactly
         const products = await productModel.find({ category: category });
 
+
         if (products.length === 0) {
             console.log('Category:', category); // Debugging
             return res.status(404).json({ success: false, message: 'No products found for this category' });
         }
-
         res.status(200).json({ success: true, products });
     } catch (error) {
         console.error('Error fetching products:', error); // Debugging
@@ -381,8 +381,11 @@ exports.productByCategory = async (req, res, next) => {
 };
 
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> 94a67aae45f0ce69d7345b8225d5d62d992c0856
 exports.searchProducts = async (req, res, next) => {
     try {
         const { query } = req.query; // Retrieve the search query from the request
@@ -416,4 +419,10 @@ exports.searchProducts = async (req, res, next) => {
         console.error('Error in searchProducts:', error);
         res.status(500).json({ success: false, message: 'Server error' });
     }
+<<<<<<< HEAD
 };
+=======
+};
+
+  
+>>>>>>> 94a67aae45f0ce69d7345b8225d5d62d992c0856
