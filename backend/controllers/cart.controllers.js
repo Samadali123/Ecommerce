@@ -95,20 +95,14 @@ exports.removeFromCart = async (req, res, next) => {
 };
 
 
-<<<<<<< HEAD
-exports.viewCart = async (req, res, next) => {
-    try {
-        // Find the user and populate the mycart field
-        const loginuser = await userModel.findOne({_id:req.user.userid}).populate("mycart");
-        // console.log(loginuser);
-=======
+
+
 
 
 exports.viewCart = async (req, res, next) => {
     try {
         // Find the user and populate the mycart field
         const loginuser = await userModel.findOne({ email: req.user.email }).populate("mycart");
->>>>>>> 39d727a262b267ad1d71ae3592eea26130d925c4
 
         // Check if user was found
         if (!loginuser) {
@@ -122,11 +116,11 @@ exports.viewCart = async (req, res, next) => {
         const getRandomProducts = async (count) => {
             const allProducts = await productModel.find(); // Fetch all products
             const shuffled = allProducts.sort(() => 0.5 - Math.random()); // Shuffle the products
-<<<<<<< HEAD
+
             return shuffled.slice(0, count); // Get the first count products
-=======
+
             return shuffled.slice(0, count); // Get the first `count` products
->>>>>>> 39d727a262b267ad1d71ae3592eea26130d925c4
+
         };
 
         // Get up to 20 random products
@@ -135,11 +129,11 @@ exports.viewCart = async (req, res, next) => {
         // Respond with user data and random products
         res.status(200).json({
             success: true,
-<<<<<<< HEAD
+
             carts: loginuser.mycart,
-=======
+
             user: loginuser,
->>>>>>> 39d727a262b267ad1d71ae3592eea26130d925c4
+
             randomProducts: randomProducts
         });
 
@@ -147,10 +141,6 @@ exports.viewCart = async (req, res, next) => {
         res.status(500).json({ success: false, message: error.message });
     }
 };
-<<<<<<< HEAD
-=======
-
->>>>>>> 39d727a262b267ad1d71ae3592eea26130d925c4
 
 
 
