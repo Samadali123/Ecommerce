@@ -7,6 +7,8 @@ import ClipLoader from 'react-spinners/ClipLoader';
 import { toast } from 'react-toastify';
 import { useParams } from 'react-router-dom';
 import Header2 from '../components/header2';
+import { useNavigate } from 'react-router-dom';
+
 
 const ViewCart = () => {
     const [cart, setCart] = useState([]);
@@ -15,6 +17,10 @@ const ViewCart = () => {
     const [loadingProducts, setLoadingProducts] = useState(true);
     const [error, setError] = useState(null);
     const { id } = useParams();
+    const navigate = useNavigate();
+    const handleViewProductClick = (productId) => {
+        navigate(`/singleproduct/${productId}`);
+    };
 
     useEffect(() => {
         // Fetch cart and recommended products from the API
@@ -47,9 +53,31 @@ const ViewCart = () => {
         fetchProducts();
     }, []);
 
-    const handleRemove = (id) => {
-        setCart(cart.filter(item => item._id !== id));
+    const handleRemove = async (id) => {
+        const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
+    
+        if (token) {
+            try {
+                const response = await axios.put(`/users/user/cart/remove?token=${token}`, {
+                    productId: id 
+                });
+    
+                if (response.data.success) {
+                    // Remove the item from the cart locally
+                    setCart(cart.filter(item => item._id !== id));
+                    toast.success('Item removed from cart.');
+                } else {
+                    toast.error('Failed to remove item from cart.');
+                }
+            } catch (error) {
+                console.error('Error removing item from cart:', error);
+                toast.error('Error removing item from cart.');
+            }
+        } else {
+            toast.error('User does not have a token.');
+        }
     };
+    
 
     const handleQuantityChange = (id, newQuantity) => {
         setCart(cart.map(item => item._id === id ? { ...item, quantity: newQuantity } : item));
@@ -180,6 +208,7 @@ const ViewCart = () => {
                                         <h3 className="text-lg font-semibold mb-2">{product.name}</h3>
                                         <p className="text-gray-600">{product.priceAfterDiscount}</p>
                                         <button
+                                        onClick={() => handleViewProductClick(product._id)} 
                                             className="mt-2 px-3 py-1 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700"
                                         >
                                             View Product

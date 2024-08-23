@@ -104,10 +104,7 @@ exports.totalproducts = async (req, res, next) => {
 
 
 
-<<<<<<< HEAD
-=======
 
->>>>>>> 39d727a262b267ad1d71ae3592eea26130d925c4
 exports.singleproduct = async (req, res, next) => {
     // Function to format numbers with commas
     const numberWithCommas = (number) => {
@@ -380,13 +377,6 @@ exports.productByCategory = async (req, res, next) => {
     }
 };
 
-<<<<<<< HEAD
-=======
-
-
-
-
->>>>>>> 39d727a262b267ad1d71ae3592eea26130d925c4
 exports.searchProducts = async (req, res, next) => {
     try {
         const { query } = req.query; // Retrieve the search query from the request
@@ -420,12 +410,11 @@ exports.searchProducts = async (req, res, next) => {
         console.error('Error in searchProducts:', error);
         res.status(500).json({ success: false, message: 'Server error' });
     }
-<<<<<<< HEAD
-}
-=======
+
+
+
 
 };
 
 
 
->>>>>>> 39d727a262b267ad1d71ae3592eea26130d925c4
