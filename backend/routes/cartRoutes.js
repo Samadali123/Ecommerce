@@ -9,13 +9,12 @@ router.post("/add", UserIsLoggedIn, addToCart);
 // /remove
 router.put("/remove", UserIsLoggedIn, removeFromCart);
 
-<<<<<<< HEAD
+
 // /cart/view
 router.get("/view", UserIsLoggedIn, viewCart )
-=======
-///view
-router.get("/view",UserIsLoggedIn, viewCart )
->>>>>>> 39d727a262b267ad1d71ae3592eea26130d925c4
+
+
+
 
 
 module.exports = router
