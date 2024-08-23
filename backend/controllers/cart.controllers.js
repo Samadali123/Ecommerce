@@ -96,9 +96,6 @@ exports.removeFromCart = async (req, res, next) => {
 
 
 
-
-
-
 exports.viewCart = async (req, res, next) => {
     try {
         // Find the user and populate the mycart field
@@ -118,9 +115,6 @@ exports.viewCart = async (req, res, next) => {
             const shuffled = allProducts.sort(() => 0.5 - Math.random()); // Shuffle the products
 
             return shuffled.slice(0, count); // Get the first count products
-
-            return shuffled.slice(0, count); // Get the first `count` products
-
         };
 
         // Get up to 20 random products
@@ -129,11 +123,8 @@ exports.viewCart = async (req, res, next) => {
         // Respond with user data and random products
         res.status(200).json({
             success: true,
-
             carts: loginuser.mycart,
-
             user: loginuser,
-
             randomProducts: randomProducts
         });
 
