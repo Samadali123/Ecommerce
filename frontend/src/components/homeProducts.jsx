@@ -21,6 +21,7 @@ const Homeproduct = () => {
     const [hoveredIndex, setHoveredIndex] = useState(null);
     const [buttonStyles, setButtonStyles] = useState({});
     const navigate = useNavigate();
+    
     const handleViewProductClick = (productId) => {
         navigate(`/singleproduct/${productId}`);
     };

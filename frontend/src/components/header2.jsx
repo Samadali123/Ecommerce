@@ -5,6 +5,7 @@ import { FaRegUser } from "react-icons/fa6";
 import UserContext from '../contexts/usercontext';
 
 
+
 const Header2 = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [suggestions, setSuggestions] = useState([]);
@@ -50,6 +51,7 @@ const Header2 = () => {
     const handleMouseLeave = () => {
         setIsDropdownVisible(false);
     };
+    const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
 
     return (
         <>
@@ -63,7 +65,7 @@ const Header2 = () => {
             </div>
             
             <div className="flex items-center space-x-6">
-                <a href="/cart" className="text-blue-700 hover:text-blue-900" style={{ fontSize: '1.2rem' }}><FiShoppingCart /></a>
+                <a href="/viewcart" className="text-blue-700 hover:text-blue-900" style={{ fontSize: '1.2rem' }}><FiShoppingCart /></a>
                 <div
                     className="relative"
                     onMouseEnter={handleMouseEnter}
@@ -73,7 +75,7 @@ const Header2 = () => {
                         <div className="absolute right-0 z-10 mt-6 ml-2 w-48 bg-white border border-gray-500 shadow-lg rounded-lg"
                             onMouseLeave={handleMouseLeave}
                         >
-                             {isAuthenticated ? ( <>
+                             {token ? ( <>
                                 <a href="/resetpassword" className="block px-4 py-2 hover:bg-blue-100" style={{ fontSize: '1rem' }}>Reset Password</a>
                                 <a href="/" onClick={logout} className="block px-4 py-2 hover:bg-blue-100" style={{ fontSize: '1rem' }}>Logout</a>
                              </> ) : (

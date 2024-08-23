@@ -3,10 +3,12 @@ const productModel = require('../models/product.model');
 const userModel = require('../models/user.model');
 
 
+
+
 exports.addToCart = async (req, res, next) => {
     try {
         const userId = req.user.userid; // Assuming user is authenticated and req.user.userid is available
-        const { productId } = req.body;
+        const { productId } = req.body || req.query.id;
 
         // Check if the product ID is provided
         if (!productId) {
@@ -95,19 +97,41 @@ exports.removeFromCart = async (req, res, next) => {
 };
 
 
-exports.viewCart = async (req, res, next)=>{
+exports.viewCart = async (req, res, next) => {
     try {
-         const loginuser = await userModel.findOne({email : req.user.email}).populate("mycart");
-         if(! loginuser) {
-            return res.status(401).json({success : false, message : "Login user not found"})
-         }
-         res.status(200).json({success :false , loginuser});
-         
-    } catch (error) {
-         res.status(error.status).json({success : false , message : error.message})
-    }
-}
+        // Find the user and populate the mycart field
+        const loginuser = await userModel.findOne({_id:req.user.userid}).populate("mycart");
+        // console.log(loginuser);
 
+        // Check if user was found
+        if (!loginuser) {
+            return res.status(401).json({ success: false, message: "Login user not found" });
+        }
+
+        // Get the cart items (optional, if you need to include cart items in the response)
+        const cartItems = loginuser.mycart;
+
+        // Function to get random items from the product model
+        const getRandomProducts = async (count) => {
+            const allProducts = await productModel.find(); // Fetch all products
+            const shuffled = allProducts.sort(() => 0.5 - Math.random()); // Shuffle the products
+            return shuffled.slice(0, count); // Get the first count products
+        };
+
+        // Get up to 20 random products
+        const randomProducts = await getRandomProducts(20);
+
+        // Respond with user data and random products
+        res.status(200).json({
+            success: true,
+            carts: loginuser.mycart,
+            randomProducts: randomProducts
+        });
+
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
 
 
 

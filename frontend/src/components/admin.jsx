@@ -7,6 +7,7 @@ import axios from '../utils/axios';
 import { toast } from 'react-toastify';
 import UserContext from '../contexts/usercontext';
 import { useNavigate,Link } from 'react-router-dom';
+import Header2 from './header2';
 
 const Admin = () => {
    const [isAdmin, setIsAdmin] = useState(false)
@@ -61,6 +62,8 @@ const Admin = () => {
   
   return (
     isAdmin ? (
+      <>
+      <Header2/>
       <div className="min-h-screen flex">
         {/* Sidebar */}
         <aside className="w-64 bg-gray-800 text-white flex flex-col">
@@ -93,13 +96,13 @@ const Admin = () => {
         <main className="flex-1 p-8 bg-gray-100">
           <header className="flex justify-between items-center mb-8">
             <h1 className="text-3xl font-bold">Dashboard</h1>
-            <Link
+            {/* <Link
             to="/resetpassword"
             className="ml-4 px-5 py-2 bg-yellow-500 text-white rounded-full font-semibold hover:bg-yellow-600 transition duration-300 shadow-lg"
           >
             Reset Password
           </Link>
-            <button  onClick={logout} className="bg-blue-600 text-white px-4 py-2 rounded-lg">Logout</button>
+            <button  onClick={logout} className="bg-blue-600 text-white px-4 py-2 rounded-lg">Logout</button> */}
           </header>
           
           {/* Dashboard Content */}
@@ -152,6 +155,7 @@ const Admin = () => {
           </section>
         </main>
       </div>
+      </>
     ) : (
       <AccessDenied />
     )

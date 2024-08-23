@@ -4,6 +4,7 @@ import axios from '../utils/axios';
 import { LuListFilter } from 'react-icons/lu';
 import Header2 from '../components/header2';
 import { ClipLoader } from 'react-spinners';
+import { useParams } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
@@ -18,7 +19,7 @@ const getRandomColor = () => {
 };
 
 const categories = [
-    "All", "Electronics", "Clothing", "Home", "Sports", 
+    "All", "Electronics", "Clothing", "Home", "Sports",
     "Kids", "Footwears", "Cosmetics", "Mens", "Womens"
 ];
 
@@ -27,7 +28,7 @@ const Productsforuser = () => {
     const navigate = useNavigate();
     const query = new URLSearchParams(location.search);
     const initialCategory = query.get('category') || "All"; // Get category from query params or default to "All"
-    
+
     const [selectedCategory, setSelectedCategory] = useState(initialCategory);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [products, setProducts] = useState([]);
@@ -37,19 +38,22 @@ const Productsforuser = () => {
     const [error, setError] = useState(null);
     const dropdownRef = useRef(null);
     const dropdownTriggerRef = useRef(null);
+    const { id } = useParams();
+    const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
+
 
     useEffect(() => {
         const fetchProducts = async (category) => {
-            const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
+            // const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
 
             try {
                 const endpoint = category === "All" ? `/products/all` : `/products/category?category=${category}`;
                 const response = await axios.get(endpoint);
                 setProducts(response.data.products);
             } catch (error) {
-                console.error('Error fetching products:', error);
+                // console.error('Error fetching products:', error);
                 setError('Failed to load products.');
-                toast.error('Error fetching products.');
+                toast.info('No Products Found For This Category.');
             } finally {
                 setLoading(false);
             }
@@ -67,8 +71,23 @@ const Productsforuser = () => {
     };
 
     // Handle Add to Cart
-    const handleAddToCart = () => {
-        toast.success('Product added successfully!');
+    // const handleAddToCart = () => {
+    //     toast.success('Product added successfully!');
+    // };
+    const handleAddToCart = async (id, token) => {
+
+        try {
+            console.log(id);
+            const response = await axios.post(
+                `/users/user/cart/add?token=${token}`, { productId: id });
+
+            // Handle the response as needed
+            console.log('Product added to cart:', response.data);
+            toast.success('Product added successfully!');
+        } catch (error) {
+            // Handle any errors
+            console.error('Error adding product to cart:', error);
+        }
     };
 
     // Toggle dropdown visibility
@@ -105,7 +124,7 @@ const Productsforuser = () => {
         <div className="flex flex-col min-h-screen bg-gray-100">
             {/* Custom Header */}
             <Header2 />
-            
+
             {/* Loader Overlay */}
             {loading && (
                 <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
@@ -115,14 +134,14 @@ const Productsforuser = () => {
 
             {/* Category Filter */}
             <div className="relative mt-4 ml-8 lg:mb-0">
-                <button 
+                <button
                     className="relative text-blue-700 flex gap-3 p-2 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-100 focus:outline-none"
                     onClick={handleDropdownToggle}
                     ref={dropdownTriggerRef}
                 >
                     Category Filter
                     <LuListFilter className="w-6 h-6" />
-                    
+
                     {/* Dropdown Menu */}
                     {dropdownOpen && (
                         <div className="absolute mt-8 left-1 w-48 bg-white shadow-lg rounded-lg z-20" ref={dropdownRef}>
@@ -147,9 +166,9 @@ const Productsforuser = () => {
             <main className="flex-1 p-4 lg:p-8">
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     {products.map(product => (
-                        <div 
-                            key={product.id} 
-                            className="bg-white p-4 rounded-lg shadow-md border border-gray-300 hover:border-blue-500 hover:shadow-lg transition-all duration-300 cursor-pointer" 
+                        <div
+                            key={product.id}
+                            className="bg-white p-4 rounded-lg shadow-md border border-gray-300 hover:border-blue-500 hover:shadow-lg transition-all duration-300 cursor-pointer"
                             onClick={() => {
                                 setSelectedProduct(product);
                                 setCurrentImageIndex(0); // Reset image index on new product selection
@@ -158,7 +177,7 @@ const Productsforuser = () => {
                             <img src={product.images[0]} alt={product.name} className="w-full h-56 flex justify-center  items-center overflow-hidden rounded-t-lg" />
                             <h3 className="text-lg font-semibold mb-2">{product.name}</h3>
                             <p className="text-gray-600 mb-2">
-                              <p className='line-through'>{product.price}</p>
+                                <p className='line-through'>{product.price}</p>
                                 {product.discount > 0 && (
                                     <p className="text-sm text-red-500 mb-1">{product.discount}% Off</p>
                                 )}
@@ -176,8 +195,8 @@ const Productsforuser = () => {
             {selectedProduct && (
                 <div className="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50 p-4">
                     <div className="bg-white p-6 rounded-lg shadow-2xl w-full max-w-4xl relative">
-                        <button 
-                            onClick={() => setSelectedProduct(null)} 
+                        <button
+                            onClick={() => setSelectedProduct(null)}
                             className="absolute top-2 right-2 text-gray-600 hover:text-gray-900 z-30"
                         >
                             <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -199,37 +218,42 @@ const Productsforuser = () => {
                                 >
                                     <FaArrowRight className="w-6 h-6" />
                                 </button>
-                                <div className="relative w-full h-96 overflow-hidden">
+                                <div className="relative w-full overflow-hidden">
                                     {selectedProduct.images && selectedProduct.images.length > 0 ? (
-                                        <img 
-                                            src={selectedProduct.images[currentImageIndex]} 
-                                            alt={selectedProduct.name} 
-                                            className="w-full h-48 flex justify-center items-center overflow-hidden rounded-t-lg"
+                                        <img
+                                            src={selectedProduct.images[currentImageIndex]}
+                                            alt={selectedProduct.name}
+                                            className="w-full h-auto object-cover flex justify-center items-center overflow-hidden rounded-t-lg"
                                         />
                                     ) : (
-                                        <img 
-                                            src={selectedProduct.image} 
-                                            alt={selectedProduct.name} 
-                                            className="w-full h-48 flex justify-center items-center overflow-hidden rounded-t-lg"
+                                        <img
+                                            src={selectedProduct.image}
+                                            alt={selectedProduct.name}
+                                            className="w-full h-auto object-cover flex justify-center items-center overflow-hidden rounded-t-lg"
                                         />
                                     )}
                                 </div>
+
                             </div>
 
                             {/* Product Details */}
-                            <div className="lg:w-1/2 lg:pl-6 mt-4 lg:mt-0">
-                                <h2 className="text-2xl font-semibold mb-4">{selectedProduct.name}</h2>
-                                <p className="text-lg font-bold text-blue-700">${selectedProduct.price}</p>
-                                <p className="text-gray-600 mt-2">{selectedProduct.description}</p>
-                                <div className="mt-4">
-                                    <button 
-                                        onClick={handleAddToCart} 
-                                        className="bg-blue-700 text-white py-2 px-4 rounded-lg hover:bg-blue-900 transition duration-300"
+                            <div className="lg:w-1/2 lg:pl-8 mt-6 lg:mt-0 bg-white p-6 rounded-lg shadow-lg">
+                                <h2 className="text-3xl font-bold text-gray-800 mb-4">{selectedProduct.name}</h2>
+
+                                <p className="text-2xl font-bold text-blue-600 mb-4">${selectedProduct.priceAfterDiscount}</p>
+
+                                <p className="text-gray-700 text-lg leading-relaxed mb-6">{selectedProduct.description}</p>
+
+                                <div className="flex items-center">
+                                    <button
+                                        onClick={() => handleAddToCart(selectedProduct._id, token)}
+                                        className="bg-blue-600 hover:bg-blue-800 text-white font-semibold py-3 px-6 rounded-lg transition-transform duration-300 transform hover:scale-105 shadow-md"
                                     >
                                         Add to Cart
                                     </button>
                                 </div>
                             </div>
+
                         </div>
                     </div>
                 </div>

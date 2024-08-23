@@ -5,13 +5,13 @@ const router = express.Router();
 
 
 // /add
-router.post("/add", addToCart);
+router.post("/add", UserIsLoggedIn, addToCart);
 
 // /remove
 router.put("/remove", removeFromCart);
 
 // /cart/view
-router.get("/view", viewCart )
+router.get("/view", UserIsLoggedIn, viewCart )
 
 
 module.exports = router

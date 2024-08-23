@@ -5,6 +5,10 @@ import 'slick-carousel/slick/slick-theme.css';
 import { ClipLoader } from 'react-spinners';
 import { useParams } from 'react-router-dom';
 import axios from '../utils/axios';
+import Header2 from './header2';
+
+import {  toast } from 'react-toastify';
+// import 'react-toastify/dist/ReactToastify.css';
 
 const SingleProduct = () => {
     const [product, setProduct] = useState(null);
@@ -13,10 +17,12 @@ const SingleProduct = () => {
     const [loading, setLoading] = useState(true);
     const [zoomedImage, setZoomedImage] = useState(null);
     const { id } = useParams();
+    const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
+
 
     useEffect(() => {
         const fetchProductData = async () => {
-            const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
+            // const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
 
             try {
                 const response = await axios.get(`/products/product/${id}?token=${token}`);
@@ -39,6 +45,23 @@ const SingleProduct = () => {
 
         fetchProductData();
     }, [id]);
+    const handleAddToCart = async (id,token) => {
+
+        try {
+            console.log(id);
+          const response = await axios.post(
+            `/users/user/cart/add?token=${token}`, {productId:id});
+            alert("Product added successfully")
+            toast.success('Product added successfully!');
+          
+          // Handle the response as needed
+          console.log('Product added to cart:', response.data);
+        } catch (error) {
+          // Handle any errors
+          console.error('Error adding product to cart:', error);
+        }
+      };
+
 
     const settings = {
         dots: true,
@@ -81,6 +104,9 @@ const SingleProduct = () => {
     };
 
     return (
+        <>
+        <Header2/>
+        
         <div className="container mx-auto p-6">
             <style>
                 {`
@@ -178,6 +204,8 @@ const SingleProduct = () => {
                         {product?.description || 'This is a description of the product. It provides details about the features and benefits.'}
                     </p>
                     <button
+                     onClick={()=> handleAddToCart(product._id, token)}
+
                         className="bg-blue-700 text-white py-2 px-4 rounded-lg hover:bg-blue-900 transition duration-300"
                     >
                         Add to Cart
@@ -233,6 +261,7 @@ const SingleProduct = () => {
                 </div>
             )}
         </div>
+        </>
     );
 };
 

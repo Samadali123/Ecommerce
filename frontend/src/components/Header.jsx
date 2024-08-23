@@ -13,6 +13,7 @@ const Header = () => {
     const [isAuthenticated, setIsAuthenticated] = useContext(UserContext);
     const navigate = useNavigate(); // Initialize navigate
 
+
     const handleSearch = async (event) => {
         const value = event.target.value;
         setSearchTerm(value);
@@ -49,6 +50,7 @@ const Header = () => {
     const handleMouseLeave = () => {
         setIsDropdownVisible(false);
     };
+    const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
 
     const logout = async () => {
         // Extract the token from the cookie
@@ -125,7 +127,7 @@ const Header = () => {
                 )}
             </div>
             <div className="flex items-center space-x-6">
-                <Link to="/cart" className="text-blue-700 hover:text-blue-900" style={{ fontSize: '1.2rem' }}>
+                <Link to="/viewcart" className="text-blue-700 hover:text-blue-900" style={{ fontSize: '1.2rem' }}>
                     <FiShoppingCart />
                 </Link>
                 <div
@@ -139,7 +141,7 @@ const Header = () => {
                         <div className="absolute right-0 z-10 mt-6 ml-2 w-48 bg-white border border-gray-500 shadow-lg rounded-lg"
                             onMouseLeave={handleMouseLeave}
                         >
-                            {isAuthenticated ? (
+                            {token ? (
                                 <>
                                     <Link to="/resetpassword" className="block px-4 py-2 hover:bg-blue-100" style={{ fontSize: '1rem' }}>Reset Password</Link>
                                     <Link to="/" onClick={logout} className="block px-4 py-2 hover:bg-blue-100" style={{ fontSize: '1rem' }}>Logout</Link>

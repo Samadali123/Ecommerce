@@ -104,10 +104,6 @@ exports.totalproducts = async (req, res, next) => {
 
 
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 94a67aae45f0ce69d7345b8225d5d62d992c0856
 exports.singleproduct = async (req, res, next) => {
     // Function to format numbers with commas
     const numberWithCommas = (number) => {
@@ -375,17 +371,11 @@ exports.productByCategory = async (req, res, next) => {
         }
         res.status(200).json({ success: true, products });
     } catch (error) {
-        console.error('Error fetching products:', error); // Debugging
+        console.error('No Products Found For this Category', error); // Debugging
         res.status(error.status || 500).json({ success: false, message: error.message });
     }
 };
 
-
-<<<<<<< HEAD
-
-
-=======
->>>>>>> 94a67aae45f0ce69d7345b8225d5d62d992c0856
 exports.searchProducts = async (req, res, next) => {
     try {
         const { query } = req.query; // Retrieve the search query from the request
@@ -419,10 +409,4 @@ exports.searchProducts = async (req, res, next) => {
         console.error('Error in searchProducts:', error);
         res.status(500).json({ success: false, message: 'Server error' });
     }
-<<<<<<< HEAD
-};
-=======
-};
-
-  
->>>>>>> 94a67aae45f0ce69d7345b8225d5d62d992c0856
+}
