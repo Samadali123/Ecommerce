@@ -68,7 +68,13 @@ const Login = () => {
       console.log('Google login successful:', response.data);
       Cookies.set('token', response.data.token, { expires: 1 / 24 });
       setIsAuthenticated(true);
-      navigate('/');
+      console.log(response)
+      if(response.data.user.isAdmin){
+        navigate('/admin');
+      }else{
+
+        navigate('/');
+      }
     } catch (error) {
       console.error('Error during Google login:', error);
       setError('Google login failed. Please try again.');
