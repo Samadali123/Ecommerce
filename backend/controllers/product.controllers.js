@@ -371,7 +371,6 @@ exports.productByCategory = async (req, res, next) => {
     }
 };
 
-
 exports.searchProducts = async (req, res, next) => {
     try {
         const { query } = req.query; // Retrieve the search query from the request
@@ -405,6 +404,7 @@ exports.searchProducts = async (req, res, next) => {
         console.error('Error in searchProducts:', error);
         res.status(500).json({ success: false, message: 'Server error' });
     }
+
 }
 
 
@@ -423,4 +423,5 @@ exports.sortProducts =   async (req, res, next) => {
       }
 }
     
+
 
