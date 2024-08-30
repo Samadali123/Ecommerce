@@ -214,7 +214,7 @@ const SingleProduct = () => {
             </div>
 
             {/* Similar Products Carousel */}
-            <div className="mt-12">
+            <div className="mt-12 scroll">
                 
                 <h3 className="text-2xl font-bold mb-6 ml-8">
                     {similarProducts && similarProducts.length > 0  ? "Similar Products " :  "More Products"}
