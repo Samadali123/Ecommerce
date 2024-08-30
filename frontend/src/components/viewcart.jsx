@@ -84,7 +84,7 @@ const ViewCart = () => {
     };
 
     const calculateTotal = () => {
-        return cart.reduce((total, item) => total + (item.price - item.discount) , 0).toFixed(2);
+        return cart.reduce((total, item) => total + (item.priceAfterDiscount - item.discount) , 0).toFixed(2);
     };
 
     const platformFee = 10.00; // Example fee

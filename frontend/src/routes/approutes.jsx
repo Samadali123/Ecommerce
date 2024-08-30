@@ -3,6 +3,7 @@ import React from 'react'
 import { Outlet, Routes } from "react-router-dom";
 import { Route } from "react-router-dom";
 import Home from '../components/home'
+// import Home from  '../components/home2.jsx'
 import Register from '../components/register';
 import Login from '../components/login';
 import Admin from '../components/admin';
@@ -18,10 +19,13 @@ import ResetPassword from '../components/resetpassword.jsx';
 import ProductsPage from '../components/productsPage.jsx';
 import Productsforuser from '../components/productsforuser.jsx';
 import Updateproduct from '../components/updateproduct.jsx';
-import Reg from '../components/reg.jsx';
-import Shop from '../components/reg.jsx';
+
+
 import SingleProduct from '../components/SingleProduct.jsx';
 import ViewCart from '../components/viewcart.jsx';
+import Orders from '../components/Orders.jsx';
+import Customers from '../components/customers.jsx';
+import Reports from '../components/Reports.jsx';
 
 
 
@@ -47,7 +51,9 @@ const routes = () => {
             <Route path='/updateproduct/:productId' element={<Updateproduct/>}></Route>
             <Route path='/singleproduct/:id' element={<SingleProduct/>}></Route>
             <Route path='/viewcart' element={<ViewCart/>}></Route>
-            <Route path='/reg' element={<Shop/>}></Route>
+            <Route path='/orders' element={<Orders/>}></Route>
+            <Route path='/customers' element={<Customers/>}></Route>
+            <Route path='/reports' element={<Reports/>}></Route>
             <Route path="*" element={<NotFound/>}></Route>    
             </Routes>    
     )

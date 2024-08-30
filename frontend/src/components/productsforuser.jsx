@@ -24,22 +24,34 @@ const categories = [
 ];
 
 const Productsforuser = () => {
+    const [dropdownOpen, setDropdownOpen] = useState(false);
+    const dropdownRef = useRef(null);
+    const dropdownTriggerRef = useRef(null);
     const location = useLocation();
     const navigate = useNavigate();
     const query = new URLSearchParams(location.search);
-    const initialCategory = query.get('category') || "All"; // Get category from query params or default to "All"
+    const initialCategory = query.get('category') || "All"; 
+    const initialPriceRange = query.get('price') || "All";
 
     const [selectedCategory, setSelectedCategory] = useState(initialCategory);
+    const [selectedPriceRange, setSelectedPriceRange] = useState(initialPriceRange);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [dropdownOpen, setDropdownOpen] = useState(false);
+    const [dropdownOpenCategory, setDropdownOpenCategory] = useState(false);
+    const [dropdownOpenPrice, setDropdownOpenPrice] = useState(false);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [error, setError] = useState(null);
-    const dropdownRef = useRef(null);
-    const dropdownTriggerRef = useRef(null);
+    const dropdownRefCategory = useRef(null);
+    const dropdownTriggerRefCategory = useRef(null);
+    const dropdownRefPrice = useRef(null);
+    const dropdownTriggerRefPrice = useRef(null);
     const { id } = useParams();
     const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
+
+    const priceRanges = [
+        "All", "0-500", "500-1000", "1000-2000", "2000-5000", "5000+"
+    ];
 
 
     useEffect(() => {
@@ -61,6 +73,12 @@ const Productsforuser = () => {
 
         fetchProducts(selectedCategory);
     }, [selectedCategory]);
+    // const handlePriceRangeSelect = (priceRange) => {
+    //     setSelectedPriceRange(priceRange);
+    //     navigate(`/productsforuser?category=${selectedCategory}&filterproducts=${priceRange}`);
+    //     setDropdownOpenPrice(false);
+    //     setSelectedProduct(null);
+    // };
 
     // Handle category selection
     const handleCategorySelect = (category) => {
@@ -89,10 +107,29 @@ const Productsforuser = () => {
             console.error('Error adding product to cart:', error);
         }
     };
+    const handleDropdownTogglePrice = () => {
+        setDropdownOpenPrice(prevState => !prevState);
+    };
 
     // Toggle dropdown visibility
     const handleDropdownToggle = () => {
         setDropdownOpen(prevState => !prevState);
+    };
+    const handlePriceRangeSelect = async (priceRange) => {
+        setSelectedPriceRange(priceRange);
+        setDropdownOpenPrice(false);
+
+        try {
+            // Send the selected price range to the backend
+            const response = await axios.get(`/products/filterproducts?filterproducts=${priceRange}`);
+            const sortedProducts = response.data.price;
+
+            // Handle the sorted products (e.g., update state or redirect to another page)
+            // Example: navigate to the products page with sorted products
+            navigate('/productsforuser', { state: { sortedProducts } });
+        } catch (error) {
+            console.error('Error fetching sorted products:', error);
+        }
     };
 
     // Close dropdown when clicking outside of it
@@ -133,7 +170,7 @@ const Productsforuser = () => {
             )}
 
             {/* Category Filter */}
-            <div className="relative mt-4 ml-8 lg:mb-0">
+            <div className="relative flex  mt-4  ml-8 lg:mb-0">
                 <button
                     className="relative text-blue-700 flex gap-3 p-2 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-100 focus:outline-none"
                     onClick={handleDropdownToggle}
@@ -160,6 +197,32 @@ const Productsforuser = () => {
                         </div>
                     )}
                 </button>
+                <button
+            className="relative ml-4 text-blue-700 flex gap-3 p-2 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-100 focus:outline-none"
+            onClick={handleDropdownTogglePrice}
+            ref={dropdownTriggerRefPrice}
+        >
+            Price Filter
+            <LuListFilter className="w-6 h-6" />
+
+            {dropdownOpenPrice && (
+                <div className="absolute mt-8 left-1 w-48 bg-white shadow-lg rounded-lg z-20" ref={dropdownRefPrice}>
+                    <ul className="space-y-2 p-2">
+                        {priceRanges.map(range => (
+                            <li key={range}>
+                                <button
+                                    onClick={() => handlePriceRangeSelect(range)}
+                                    className={`w-full p-2 rounded-lg text-left ${selectedPriceRange === range ? 'bg-blue-800 text-white' : 'bg-gray-200 text-gray-700'} hover:bg-blue-700 hover:text-white transition duration-300`}
+                                >
+                                    {range}
+                                </button>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            )}
+        </button>
+
             </div>
 
             {/* Product Grid */}
@@ -193,71 +256,70 @@ const Productsforuser = () => {
 
             {/* Product Detail Modal */}
             {selectedProduct && (
-                <div className="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white p-6 rounded-lg shadow-2xl w-full max-w-4xl relative">
-                        <button
-                            onClick={() => setSelectedProduct(null)}
-                            className="absolute top-2 right-2 text-gray-600 hover:text-gray-900 z-30"
-                        >
-                            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-                        <div className="flex flex-col lg:flex-row">
-                            {/* Image Carousel */}
-                            <div className="lg:w-1/2 relative">
-                                <button
-                                    onClick={() => handleImageChange(-1)}
-                                    className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white text-gray-600 hover:text-gray-900 p-3 rounded-full shadow-md z-30"
-                                >
-                                    <FaArrowLeft className="w-6 h-6" />
-                                </button>
-                                <button
-                                    onClick={() => handleImageChange(1)}
-                                    className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white text-gray-600 hover:text-gray-900 p-3 rounded-full shadow-md z-30"
-                                >
-                                    <FaArrowRight className="w-6 h-6" />
-                                </button>
-                                <div className="relative w-full overflow-hidden">
-                                    {selectedProduct.images && selectedProduct.images.length > 0 ? (
-                                        <img
-                                            src={selectedProduct.images[currentImageIndex]}
-                                            alt={selectedProduct.name}
-                                            className="w-full h-auto object-cover flex justify-center items-center overflow-hidden rounded-t-lg"
-                                        />
-                                    ) : (
-                                        <img
-                                            src={selectedProduct.image}
-                                            alt={selectedProduct.name}
-                                            className="w-full h-auto object-cover flex justify-center items-center overflow-hidden rounded-t-lg"
-                                        />
-                                    )}
-                                </div>
-
-                            </div>
-
-                            {/* Product Details */}
-                            <div className="lg:w-1/2 lg:pl-8 mt-6 lg:mt-0 bg-white p-6 rounded-lg shadow-lg">
-                                <h2 className="text-3xl font-bold text-gray-800 mb-4">{selectedProduct.name}</h2>
-
-                                <p className="text-2xl font-bold text-blue-600 mb-4">${selectedProduct.priceAfterDiscount}</p>
-
-                                <p className="text-gray-700 text-lg leading-relaxed mb-6">{selectedProduct.description}</p>
-
-                                <div className="flex items-center">
-                                    <button
-                                        onClick={() => handleAddToCart(selectedProduct._id, token)}
-                                        className="bg-blue-600 hover:bg-blue-800 text-white font-semibold py-3 px-6 rounded-lg transition-transform duration-300 transform hover:scale-105 shadow-md"
-                                    >
-                                        Add to Cart
-                                    </button>
-                                </div>
-                            </div>
-
-                        </div>
+    <div className="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50 p-4">
+        <div className="bg-white p-6 rounded-lg shadow-2xl w-full max-w-4xl relative overflow-y-auto max-h-full">
+            <button
+                onClick={() => setSelectedProduct(null)}
+                className="absolute top-2 right-2 text-gray-600 hover:text-gray-900 z-30"
+            >
+                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            <div className="flex flex-col lg:flex-row">
+                {/* Image Carousel */}
+                <div className="lg:w-1/2 relative">
+                    <button
+                        onClick={() => handleImageChange(-1)}
+                        className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white text-gray-600 hover:text-gray-900 p-3 rounded-full shadow-md z-30"
+                    >
+                        <FaArrowLeft className="w-6 h-6" />
+                    </button>
+                    <button
+                        onClick={() => handleImageChange(1)}
+                        className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white text-gray-600 hover:text-gray-900 p-3 rounded-full shadow-md z-30"
+                    >
+                        <FaArrowRight className="w-6 h-6" />
+                    </button>
+                    <div className="relative w-full overflow-hidden">
+                        {selectedProduct.images && selectedProduct.images.length > 0 ? (
+                            <img
+                                src={selectedProduct.images[currentImageIndex]}
+                                alt={selectedProduct.name}
+                                className="w-full h-auto object-cover flex justify-center items-center overflow-hidden rounded-t-lg"
+                            />
+                        ) : (
+                            <img
+                                src={selectedProduct.image}
+                                alt={selectedProduct.name}
+                                className="w-full h-auto object-cover flex justify-center items-center overflow-hidden rounded-t-lg"
+                            />
+                        )}
                     </div>
                 </div>
-            )}
+
+                {/* Product Details */}
+                <div className="lg:w-1/2 lg:pl-8 mt-6 lg:mt-0 bg-white p-6 rounded-lg shadow-lg">
+                    <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-4">{selectedProduct.name}</h2>
+
+                    <p className="text-xl sm:text-2xl font-bold text-blue-600 mb-4">${selectedProduct.priceAfterDiscount}</p>
+
+                    <p className="text-gray-700 text-sm sm:text-lg leading-relaxed mb-6">{selectedProduct.description}</p>
+
+                    <div className="flex items-center">
+                        <button
+                            onClick={() => handleAddToCart(selectedProduct._id, token)}
+                            className="bg-blue-600 hover:bg-blue-800 text-white font-semibold py-2 sm:py-3 px-4 sm:px-6 rounded-lg transition-transform duration-300 transform hover:scale-105 shadow-md"
+                        >
+                            Add to Cart
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+)}
+
 
             <ToastContainer />
         </div>

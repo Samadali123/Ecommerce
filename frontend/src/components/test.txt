@@ -1,0 +1,43 @@
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+
+function ProductList() {
+  const [products, setProducts] = useState([]);
+  const [sortOrder, setSortOrder] = useState('asc'); // Default to min to max
+
+  useEffect(() => {
+    fetchProducts(sortOrder);
+  }, [sortOrder]);
+
+  const fetchProducts = async (order) => {
+    try {
+      const response = await axios.get(/products, {
+        params: { sortOrder: order }
+      });
+      setProducts(response.data); // Update state with sorted products
+    } catch (error) {
+      console.error('Error fetching products:', error);
+    }
+  };
+
+  const handleSortOrderChange = (e) => {
+    setSortOrder(e.target.value);
+  };
+
+  return (
+    <div>
+      <select value={sortOrder} onChange={handleSortOrderChange}>
+        <option value="asc">Price: Low to High</option>
+        <option value="desc">Price: High to Low</option>
+      </select>
+
+      <ul>
+        {products.map(product => (
+          <li key={product._id}>{product.name} - ${product.price}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+export default ProductList;

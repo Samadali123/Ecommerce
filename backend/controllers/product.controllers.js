@@ -1,72 +1,141 @@
 require("dotenv").config();
 const productModel = require("../models/product.model");
-
+const multer = require('multer');
+const path = require('path');
 
 
 const numberWithCommas = (number) => {
     return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
 
-exports.addProduct = async (req, res, next) => {
+
+// exports.addProduct = async (req, res) => {
+//     try {
+//       const { name, description, price, category, stock, discount } = req.body;
+  
+//       // Check if all required fields are present
+//       if (!name || !description || !price || !category || !stock || !discount) {
+//         return res.status(400).json({ success: false, message: "Please fill in all product details" });
+//       }
+  
+//       // Sanitize and validate price
+//       let sanitizedPrice = parseFloat(price.replace(/,/g, '')); // Remove commas and convert to number
+//       if (isNaN(sanitizedPrice) || sanitizedPrice < 0) {
+//         return res.status(400).json({ success: false, message: "Price must be a valid number greater than or equal to 0" });
+//       }
+  
+//       // Sanitize and validate discount
+//       let numericDiscount = parseFloat(discount);
+//       if (isNaN(numericDiscount) || numericDiscount < 0 || numericDiscount > 100) {
+//         return res.status(400).json({ success: false, message: "Discount must be a number between 0 and 100" });
+//       }
+  
+//       // Calculate the final price after discount
+//       let finalPrice = sanitizedPrice;
+//       if (numericDiscount > 0) {
+//         finalPrice = sanitizedPrice - (sanitizedPrice * (numericDiscount / 100));
+//       }
+  
+//       // Collect image file paths from req.files
+//       const images = req.files.map(file => file.filename);
+  
+//       // Create a new product
+//       const newProduct = await productModel.create({
+//         name,
+//         description,
+//         price: sanitizedPrice,
+//         priceAfterDiscount: finalPrice,
+//         category,
+//         stock,
+//         images,
+//         discount: numericDiscount,
+//       });
+  
+//       // Send the created product as JSON
+//       res.status(201).json({
+//         success: true,
+//         newProduct
+//       });
+  
+//     } catch (error) {
+//       console.error('Error creating product:', error);
+//       res.status(500).json({ success: false, message: "Internal Server Error" });
+//     }
+//   };
+
+
+exports.addProduct = async (req, res) => {
     try {
-        const { name, description, price, category, stock, images, discount } = req.body;
-      
-        // Check if all required fields are present
-        if (!name || !description || !price || !category || !stock || !images || !discount) {
-            return res.status(400).json({ success: false, message: "Please fill in all product details" });
-        }
-
-        // Sanitize and validate price
-        let sanitizedPrice = parseFloat(price.replace(/,/g, '')); // Remove commas and convert to number
-        if (isNaN(sanitizedPrice) || sanitizedPrice < 0) {
-            return res.status(400).json({ success: false, message: "Price must be a valid number greater than or equal to 0" });
-        }
-
-        // Sanitize and validate discount
-        let numericDiscount = parseFloat(discount);
-        if (isNaN(numericDiscount) || numericDiscount < 0 || numericDiscount > 100) {
-            return res.status(400).json({ success: false, message: "Discount must be a number between 0 and 100" });
-        }
-
-        // Calculate the final price after discount
-        let finalPrice = sanitizedPrice;
-        if (numericDiscount > 0) {
-            finalPrice = sanitizedPrice - (sanitizedPrice * (numericDiscount / 100));
-        }
-
-        // Create a new product
-        const newProduct = await productModel.create({
-            name,
-            description,
-            price: sanitizedPrice,
-            priceAfterDiscount: finalPrice,
-            category,
-            stock,
-            images,
-            discount: numericDiscount
-        });
-
-        // Format numbers with commas
-        const formattedPrice = numberWithCommas(newProduct.price);
-        const formattedPriceAfterDiscount = numberWithCommas(newProduct.priceAfterDiscount);
-
-        // Return the response with formatted prices
-        res.status(200).json({
-            success: true,
-            newProduct: {
-                ...newProduct.toObject(),
-                price: formattedPrice,
-                priceAfterDiscount: formattedPriceAfterDiscount
-            }
-        });
-
+      const { name, description, price, category, stock, discount } = req.body;
+  
+      // Check if all required fields are present
+      if (!name || !description || !price || !category || !stock || !discount) {
+        return res.status(400).json({ success: false, message: "Please fill in all product details" });
+      }
+  
+      // Predefined list of valid categories
+      const validCategories = [
+        'Electronics', 'Clothing', 'Home', 'Cosmetics', 
+        'Mens', 'Womens', 'Kids', 'Sports'
+      ];
+  
+      // Validate category against the predefined list
+      if (!validCategories.includes(category)) {
+        return res.status(400).json({ success: false, message: "Invalid category" });
+      }
+  
+      // Sanitize and validate price
+      let sanitizedPrice = parseFloat(price.replace(/,/g, '')); // Remove commas and convert to number
+      if (isNaN(sanitizedPrice) || sanitizedPrice < 0) {
+        return res.status(400).json({ success: false, message: "Price must be a valid number greater than or equal to 0" });
+      }
+  
+      // Sanitize and validate discount
+      let numericDiscount = parseFloat(discount);
+      if (isNaN(numericDiscount) || numericDiscount < 0 || numericDiscount > 100) {
+        return res.status(400).json({ success: false, message: "Discount must be a number between 0 and 100" });
+      }
+  
+      // Calculate the final price after discount
+      let finalPrice = sanitizedPrice;
+      if (numericDiscount > 0) {
+        finalPrice = sanitizedPrice - (sanitizedPrice * (numericDiscount / 100));
+      }
+  
+      // Validate images
+      if (!req.files || req.files.length === 0) {
+        return res.status(400).json({ success: false, message: "Please upload at least one image" });
+      }
+  
+      // Collect image file paths from req.files
+      const images = req.files.map(file => file.filename);
+  
+      // Create a new product
+      const newProduct = await productModel.create({
+        name,
+        description,
+        price: sanitizedPrice,
+        priceAfterDiscount: finalPrice,
+        category,
+        stock,
+        images,
+        discount: numericDiscount,
+      });
+  
+      // Send the created product as JSON
+      res.status(201).json({
+        success: true,
+        newProduct
+      });
+  
     } catch (error) {
-        console.error('Error creating product:', error);
-        res.status(500).json({ success: false, message: "Internal Server Error" });
+      console.error('Error creating product:', error);
+      res.status(500).json({ success: false, message: "Internal Server Error" });
     }
-};
+  };
+  
 
-
+  
 
 exports.totalproducts = async (req, res, next) => {
     // Function to format numbers with commas
@@ -416,5 +485,105 @@ exports.searchProducts = async (req, res, next) => {
 
 };
 
+exports.sortProducts = async (req, res, next) => {
+    try {
+      // Get the selected price range from query params
+      const priceRange = req.query.filterproducts || "All";
+      
+      let filter = {};
+  
+      // Set filter based on the selected price range
+      switch (priceRange) {
+        case "0-500":
+          filter.price = { $gte: 0, $lte: 500 };
+          break;
+        case "500-1000":
+          filter.price = { $gte: 500, $lte: 1000 };
+          break;
+        case "1000-2000":
+          filter.price = { $gte: 1000, $lte: 2000 };
+          break;
+        case "2000-5000":
+          filter.price = { $gte: 2000, $lte: 5000 };
+          break;
+        case "5000+":
+          filter.price = { $gte: 5000 };
+          break;
+        default:
+          // "All" or unrecognized price range means no filtering by price
+          break;
+      }
+  
+      // Fetch and sort products by price within the specified range
+      const products = await productModel.find(filter).sort({ price: 1 });
+  
+      // Respond with sorted and filtered products
+      res.status(200).json(products);
+    } catch (error) {
+      res.status(500).json({ message: 'Server error', error });
+    }
+  };
+  const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'uploads/'); // Set the destination folder for the images
+    },
+    filename: function (req, file, cb) {
+        cb(null, Date.now() + path.extname(file.originalname)); // Set the file name
+    }
+});
+const upload = multer({ storage: storage });
+  exports.uploadImages = upload.array('images',5);
 
-
+exports.addProduct = async (req, res) => {
+    try {
+      const { name, description, price, category, stock, discount } = req.body;
+  
+      // Check if all required fields are present
+      if (!name || !description || !price || !category || !stock || !discount) {
+        return res.status(400).json({ success: false, message: "Please fill in all product details" });
+      }
+  
+      // Sanitize and validate price
+      let sanitizedPrice = parseFloat(price.replace(/,/g, '')); // Remove commas and convert to number
+      if (isNaN(sanitizedPrice) || sanitizedPrice < 0) {
+        return res.status(400).json({ success: false, message: "Price must be a valid number greater than or equal to 0" });
+      }
+  
+      // Sanitize and validate discount
+      let numericDiscount = parseFloat(discount);
+      if (isNaN(numericDiscount) || numericDiscount < 0 || numericDiscount > 100) {
+        return res.status(400).json({ success: false, message: "Discount must be a number between 0 and 100" });
+      }
+  
+      // Calculate the final price after discount
+      let finalPrice = sanitizedPrice;
+      if (numericDiscount > 0) {
+        finalPrice = sanitizedPrice - (sanitizedPrice * (numericDiscount / 100));
+      }
+  
+      // Collect image file paths from req.files
+      const images = req.files.map(file => file.filename);
+  
+      // Create a new product
+      const newProduct = await productModel.create({
+        name,
+        description,
+        price: sanitizedPrice,
+        priceAfterDiscount: finalPrice,
+        category,
+        stock,
+        images,
+        discount: numericDiscount,
+      });
+  
+      // Send the created product as JSON
+      res.status(201).json({
+        success: true,
+        newProduct
+      });
+  
+    } catch (error) {
+      console.error('Error creating product:', error);
+      res.status(500).json({ success: false, message: "Internal Server Error" });
+    }
+  };
