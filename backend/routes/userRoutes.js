@@ -1,6 +1,6 @@
 
 const express = require('express');
-const { registeraccount, loginaccount, logoutaccount, adminaccount, loginWithGoogle, forgotPassword, updatePassword, changePassword } = require('../controllers/user.controllers');
+const { registeraccount, loginaccount, logoutaccount, adminaccount, loginWithGoogle, forgotPassword, updatePassword, changePassword, currentUser, getUserProfile } = require('../controllers/user.controllers');
 const { UserIsLoggedIn } = require('../middlewares/auth.middleware');
 const router = express.Router();
 
@@ -24,5 +24,11 @@ router.put('/updatepassword', updatePassword);
 
 // /resetpassword
 router.put("/resetpassword", UserIsLoggedIn, changePassword);
+
+router.get("/currentuser", UserIsLoggedIn, currentUser)
+
+
+///profile
+router.get("/profile", UserIsLoggedIn, getUserProfile);
 
 module.exports = router;

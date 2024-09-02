@@ -72,6 +72,7 @@ const Header2 = () => {
 
     return (
         <header className="bg-gradient-to-r from-blue-500 to-purple-500 px-4 py-2 flex justify-between items-center" style={{ height: '8vh' }}>
+            
             <div className="flex items-center">
                 <div onClick={handleDivClick} className="text-white cursor-pointer text-2xl font-bold">My Shopee</div>
             </div>

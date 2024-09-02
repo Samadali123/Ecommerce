@@ -37,14 +37,35 @@ const Homeproduct = () => {
         fetchProducts();
     }, []);
 
-    
+    useEffect(() => {
+        if (products.length > 0) {
+            gsap.fromTo(
+                productRefs.current,
+                { opacity: 0, y: 50 },
+                {
+                    opacity: 1,
+                    y: 0,
+                    duration: 1,
+                    stagger: 0.2,
+                    ease: 'power3.out',
+                    scrollTrigger: {
+                        trigger: '.homeproducts',
+                        start: 'top bottom',
+                        end: 'bottom top',
+                        scrub: true,
+                    },
+                }
+            );
+        }
+    }, [products]);
+
     if (loading) return <div>Loading...</div>;
     if (error) return <div>Error: {error}</div>;
 
     return (
         <section className="py-8 bg-white homeproducts">
             <div className="container mx-auto px-4">
-                <h2 className="text-3xl font-bold  text-gray-700 mb-8">Our Latest Products</h2>
+                <h2 className="text-3xl font-bold text-gray-700 mb-8">Our Latest Products</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     {products.map((product, index) => (
                         <div
@@ -62,9 +83,9 @@ const Homeproduct = () => {
                             </div>
 
                             <div className="p-4">
-                                <h2 className="text-lg font-semibold text-gray-800">{product.name}</h2>
+                                <h2 className="text-sm font-semibold text-gray-800 line-clamp-1">{product.name}</h2>
                                 <div className="mt-2">
-                                    <p className="text-red-600 text-xl font-bold">{`From ₹${product.priceAfterDiscount} `}</p>
+                                    <p className="text-blue-500 text-lg font-bold">{` ₹${product.priceAfterDiscount} `}</p>
                                     <p className="text-gray-500 text-sm line-through mt-1">{`₹${product.price} `}</p>
                                 </div>
                                 <p className="text-sm text-gray-500 mt-1">{`${product.discount}% Off`}</p>

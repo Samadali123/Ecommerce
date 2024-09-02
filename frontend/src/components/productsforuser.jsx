@@ -1,22 +1,15 @@
+
+
 import React, { useState, useRef, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from '../utils/axios';
 import { LuListFilter } from 'react-icons/lu';
 import Header2 from '../components/header2';
 import { ClipLoader } from 'react-spinners';
-import { useParams } from 'react-router-dom';
+import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
+import { Range, getTrackBackground } from 'react-range';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
-
-const getRandomColor = () => {
-    const letters = '0123456789ABCDEF';
-    let color = '#';
-    for (let i = 0; i < 6; i++) {
-        color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
-};
 
 const categories = [
     "All", "Electronics", "Clothing", "Home", "Sports",
@@ -25,47 +18,98 @@ const categories = [
 
 const Productsforuser = () => {
     const [dropdownOpen, setDropdownOpen] = useState(false);
-    const dropdownRef = useRef(null);
-    const dropdownTriggerRef = useRef(null);
+    const [dropdownOpenPrice, setDropdownOpenPrice] = useState(false);
+    const [selectedCategory, setSelectedCategory] = useState("All");
+    const [products, setProducts] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [selectedProduct, setSelectedProduct] = useState(null);
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const [priceRange, setPriceRange] = useState([0, 500000]); // Initial price range
+    const [minPrice, setMinPrice] = useState(0);
+    const [maxPrice, setMaxPrice] = useState(500000);
+    const [noProductsFound, setNoProductsFound] = useState(false);
+
     const location = useLocation();
     const navigate = useNavigate();
     const query = new URLSearchParams(location.search);
-    const initialCategory = query.get('category') || "All"; 
+    const initialCategory = query.get('category') || "All";
     const initialPriceRange = query.get('price') || "All";
-
-    const [selectedCategory, setSelectedCategory] = useState(initialCategory);
-    const [selectedPriceRange, setSelectedPriceRange] = useState(initialPriceRange);
-    const [selectedProduct, setSelectedProduct] = useState(null);
-    const [products, setProducts] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [dropdownOpenCategory, setDropdownOpenCategory] = useState(false);
-    const [dropdownOpenPrice, setDropdownOpenPrice] = useState(false);
-    const [currentImageIndex, setCurrentImageIndex] = useState(0);
-    const [error, setError] = useState(null);
-    const dropdownRefCategory = useRef(null);
-    const dropdownTriggerRefCategory = useRef(null);
-    const dropdownRefPrice = useRef(null);
-    const dropdownTriggerRefPrice = useRef(null);
-    const { id } = useParams();
     const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
 
-    const priceRanges = [
-        "All", "0-500", "500-1000", "1000-2000", "2000-5000", "5000+"
-    ];
+    const handleDropdownToggle = () => {
+        setDropdownOpen(prevState => !prevState);
+    };
 
+    const handleDropdownTogglePrice = () => {
+        setDropdownOpenPrice(prevState => !prevState);
+    };
+
+    const handleCategorySelect = (category) => {
+        setSelectedCategory(category);
+        navigate(`/productsforuser?category=${category}`);
+        setDropdownOpen(false);
+        setSelectedProduct(null);
+    };
+
+    const handleApplyPriceFilter = async () => {
+        if (minPrice === "" || minPrice === null || maxPrice === "" || maxPrice === null) {
+            toast.info("Please Set a Price Range.");
+            return;
+        }
+
+        try {
+            const response = await axios.get(`/products/filterproducts?minPrice=${minPrice}&maxPrice=${maxPrice}`);
+            if (response.data.success) {
+                setProducts(response.data.products);
+                setNoProductsFound(response.data.products.length === 0);
+            }
+        } catch (error) {
+            console.error("Error fetching filtered products:", error);
+        }
+
+        setDropdownOpenPrice(false);
+    };
+
+    const handlePriceRangeChange = (values) => {
+        setPriceRange(values);
+        setMinPrice(values[0]);
+        setMaxPrice(values[1]);
+    };
+
+    const handleImageChange = (direction) => {
+        if (selectedProduct && selectedProduct.images) {
+            const newIndex = (currentImageIndex + direction + selectedProduct.images.length) % selectedProduct.images.length;
+            setCurrentImageIndex(newIndex);
+        }
+    };
+
+    const handleAddToCart = async (productId) => {
+        if (!token) {
+            toast.info('Please log in to add items to your cart.');
+            return;
+        }
+
+        try {
+            const response = await axios.post(`/users/user/cart/add?token=${token}`, { productId });
+            if (response.data.success) {
+                toast.success('Product added to cart successfully!');
+            } else {
+                toast.error('Failed to add product to cart.');
+            }
+        } catch (error) {
+            console.error("Error adding product to cart:", error);
+            toast.error('Error adding product to cart.');
+        }
+    };
 
     useEffect(() => {
         const fetchProducts = async (category) => {
-            // const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
-
             try {
-                const endpoint = category === "All" ? `/products/all` : `/products/category?category=${category}`;
+                const endpoint = category === "All" ? "/products/all" : `/products/category?category=${category}`;
                 const response = await axios.get(endpoint);
                 setProducts(response.data.products);
             } catch (error) {
-                // console.error('Error fetching products:', error);
-                setError('Failed to load products.');
-                toast.info('No Products Found For This Category.');
+                toast.info('No products found for this category.');
             } finally {
                 setLoading(false);
             }
@@ -73,72 +117,34 @@ const Productsforuser = () => {
 
         fetchProducts(selectedCategory);
     }, [selectedCategory]);
-    // const handlePriceRangeSelect = (priceRange) => {
-    //     setSelectedPriceRange(priceRange);
-    //     navigate(`/productsforuser?category=${selectedCategory}&filterproducts=${priceRange}`);
-    //     setDropdownOpenPrice(false);
-    //     setSelectedProduct(null);
-    // };
 
-    // Handle category selection
-    const handleCategorySelect = (category) => {
-        setSelectedCategory(category);
-        navigate(`/productsforuser?category=${category}`); // Update URL with selected category
-        setDropdownOpen(false);
-        setSelectedProduct(null);
-    };
+    useEffect(() => {
+        const fetchProductsByPrice = async () => {
+            if (minPrice !== null && maxPrice !== null) {
+                try {
+                    const response = await axios.get(`/products/filterproducts?minPrice=${minPrice}&maxPrice=${maxPrice}`);
+                    if (response.data.success) {
+                        setProducts(response.data.products);
+                        setNoProductsFound(response.data.products.length === 0);
+                        
+                    }
+                } catch (error) {
+                    console.error("Error fetching filtered products:", error);
+                }
+            }
+        };
 
-    // Handle Add to Cart
-    // const handleAddToCart = () => {
-    //     toast.success('Product added successfully!');
-    // };
-    const handleAddToCart = async (id, token) => {
+        fetchProductsByPrice();
+    }, [minPrice, maxPrice]);
 
-        try {
-            console.log(id);
-            const response = await axios.post(
-                `/users/user/cart/add?token=${token}`, { productId: id });
-
-            // Handle the response as needed
-            console.log('Product added to cart:', response.data);
-            toast.success('Product added successfully!');
-        } catch (error) {
-            // Handle any errors
-            console.error('Error adding product to cart:', error);
-        }
-    };
-    const handleDropdownTogglePrice = () => {
-        setDropdownOpenPrice(prevState => !prevState);
-    };
-
-    // Toggle dropdown visibility
-    const handleDropdownToggle = () => {
-        setDropdownOpen(prevState => !prevState);
-    };
-    const handlePriceRangeSelect = async (priceRange) => {
-        setSelectedPriceRange(priceRange);
-        setDropdownOpenPrice(false);
-
-        try {
-            // Send the selected price range to the backend
-            const response = await axios.get(`/products/filterproducts?filterproducts=${priceRange}`);
-            const sortedProducts = response.data.price;
-
-            // Handle the sorted products (e.g., update state or redirect to another page)
-            // Example: navigate to the products page with sorted products
-            navigate('/productsforuser', { state: { sortedProducts } });
-        } catch (error) {
-            console.error('Error fetching sorted products:', error);
-        }
-    };
-
-    // Close dropdown when clicking outside of it
     const handleClickOutside = (event) => {
-        if (
-            dropdownRef.current && !dropdownRef.current.contains(event.target) &&
-            dropdownTriggerRef.current && !dropdownTriggerRef.current.contains(event.target)
-        ) {
+        if (dropdownRef.current && !dropdownRef.current.contains(event.target) &&
+            dropdownTriggerRef.current && !dropdownTriggerRef.current.contains(event.target)) {
             setDropdownOpen(false);
+        }
+        if (dropdownRefPrice.current && !dropdownRefPrice.current.contains(event.target) &&
+            dropdownTriggerRefPrice.current && !dropdownTriggerRefPrice.current.contains(event.target)) {
+            setDropdownOpenPrice(false);
         }
     };
 
@@ -149,17 +155,14 @@ const Productsforuser = () => {
         };
     }, []);
 
-    // Change image in carousel
-    const handleImageChange = (direction) => {
-        if (selectedProduct && selectedProduct.images) {
-            const newIndex = (currentImageIndex + direction + selectedProduct.images.length) % selectedProduct.images.length;
-            setCurrentImageIndex(newIndex);
-        }
-    };
+    const dropdownRef = useRef(null);
+    const dropdownTriggerRef = useRef(null);
+    const dropdownRefPrice = useRef(null);
+    const dropdownTriggerRefPrice = useRef(null);
 
     return (
         <div className="flex flex-col min-h-screen bg-gray-100">
-            {/* Custom Header */}
+{/*  Custom Header*/}
             <Header2 />
 
             {/* Loader Overlay */}
@@ -196,39 +199,82 @@ const Productsforuser = () => {
                             </ul>
                         </div>
                     )}
-                </button>
+                </button> 
+
                 <button
-            className="relative ml-4 text-blue-700 flex gap-3 p-2 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-100 focus:outline-none"
-            onClick={handleDropdownTogglePrice}
-            ref={dropdownTriggerRefPrice}
-        >
-            Price Filter
-            <LuListFilter className="w-6 h-6" />
+                    className="relative ml-4 text-blue-700 flex gap-3 p-2 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-100 focus:outline-none"
+                    onClick={handleDropdownTogglePrice}
+                    ref={dropdownTriggerRefPrice}
+                >
+                    Price Filter
+                    <LuListFilter className="w-6 h-6" />
 
-            {dropdownOpenPrice && (
-                <div className="absolute mt-8 left-1 w-48 bg-white shadow-lg rounded-lg z-20" ref={dropdownRefPrice}>
-                    <ul className="space-y-2 p-2">
-                        {priceRanges.map(range => (
-                            <li key={range}>
-                                <button
-                                    onClick={() => handlePriceRangeSelect(range)}
-                                    className={`w-full p-2 rounded-lg text-left ${selectedPriceRange === range ? 'bg-blue-800 text-white' : 'bg-gray-200 text-gray-700'} hover:bg-blue-700 hover:text-white transition duration-300`}
-                                >
-                                    {range}
-                                </button>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-            )}
-        </button>
-
+                    {dropdownOpenPrice && (
+                        <div className="absolute mt-8 left-1 w-64 bg-white shadow-lg rounded-lg z-20 p-4" ref={dropdownRefPrice}>
+                            <Range
+                                values={priceRange}
+                                step={100}
+                                min={0}
+                                max={500000}
+                                onChange={handlePriceRangeChange}
+                                renderTrack={({ props, children }) => (
+                                    <div
+                                        {...props}
+                                        style={{
+                                            ...props.style,
+                                            height: '6px',
+                                            width: '100%',
+                                            background: getTrackBackground({
+                                                values: priceRange,
+                                                colors: ['#ccc', '#007bff', '#ccc'],
+                                                min: 0,
+                                                max: 500000,
+                                            }),
+                                        }}
+                                    >
+                                        {children}
+                                    </div>
+                                )}
+                                renderThumb={({ props }) => (
+                                    <div
+                                        {...props}
+                                        style={{
+                                            ...props.style,
+                                            height: '24px',
+                                            width: '24px',
+                                            borderRadius: '50%',
+                                            backgroundColor: '#007bff',
+                                            display: 'flex',
+                                            justifyContent: 'center',
+                                            alignItems: 'center',
+                                        }}
+                                    >
+                                        <div style={{ width: '10px', height: '10px', backgroundColor: '#fff', borderRadius: '50%' }} />
+                                    </div>
+                                )}
+                            />
+                            <div className="flex justify-between mt-2 text-sm text-gray-700">
+                                <span>{priceRange[0]}</span>
+                                <span>{priceRange[1]}</span>
+                            </div>
+                            <button
+                                onClick={handleApplyPriceFilter}
+                                className="mt-4 w-full py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                            >
+                                Apply
+                            </button>
+                        </div>
+                    )}
+                </button>
             </div>
 
-            {/* Product Grid */}
-            <main className="flex-1 p-4 lg:p-8">
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                    {products.map(product => (
+             {/* Product Grid */}
+             <main className="flex-1 p-4 lg:p-8">
+               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+               {noProductsFound ? (
+                    <h3 className="text-xl font-semibold text-gray-700">No products found in this price range.</h3>
+                ) : (
+                     products.map(product => (
                         <div
                             key={product.id}
                             className="bg-white p-4 rounded-lg shadow-md border border-gray-300 hover:border-blue-500 hover:shadow-lg transition-all duration-300 cursor-pointer"
@@ -238,7 +284,7 @@ const Productsforuser = () => {
                             }}
                         >
                             <img src={product.images[0]} alt={product.name} className="w-full h-56 flex justify-center  items-center overflow-hidden rounded-t-lg" />
-                            <h3 className="text-lg font-semibold mb-2">{product.name}</h3>
+                            <h3 className="text-lg font-semibold line-clamp-1 mb-2">{product.name}</h3>
                             <p className="text-gray-600 mb-2">
                                 <p className='line-through'>{product.price}</p>
                                 {product.discount > 0 && (
@@ -250,7 +296,8 @@ const Productsforuser = () => {
                                 View Product
                             </button>
                         </div>
-                    ))}
+                    ))
+                )}
                 </div>
             </main>
 
@@ -299,6 +346,7 @@ const Productsforuser = () => {
                 </div>
 
                 {/* Product Details */}
+                
                 <div className="lg:w-1/2 lg:pl-8 mt-6 lg:mt-0 bg-white p-6 rounded-lg shadow-lg">
                     <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-4">{selectedProduct.name}</h2>
 

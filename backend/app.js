@@ -9,6 +9,7 @@ const adminRoutes = require("./routes/adminRoutes");
 const productRoutes = require("./routes/productRoutes");
 const cartRoutes = require("./routes/cartRoutes");
 const cors = require("cors");
+const wishlistRoutes =  require("./routes/wishlistRoutes");
 
 // Set up a database connection
 require("./config/db.config").DbConnection();
@@ -37,6 +38,9 @@ app.use('/Ecommerce/products', productRoutes);
 
 // Base URI for cart routes
 app.use('/Ecommerce/users/user/cart', cartRoutes);
+
+// Base Uri for wishlist routes
+app.use("/Ecommerce/user/wishlist", wishlistRoutes)
 
 // Catch-all route for unknown paths
 app.all('*', (req, res) => {

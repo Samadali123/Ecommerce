@@ -5,6 +5,8 @@ import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 
 const categories = [
+  'Nutrition & more',
+  'flights & hotels',
   'electronics',
   'clothing',
   'home',

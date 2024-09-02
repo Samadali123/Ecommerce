@@ -487,40 +487,37 @@ exports.searchProducts = async (req, res, next) => {
 
 exports.sortProducts = async (req, res, next) => {
     try {
-      // Get the selected price range from query params
-      const priceRange = req.query.filterproducts || "All";
-      
-      let filter = {};
+      // Get price range from query parameters
+      const { minPrice, maxPrice } = req.query;
   
-      // Set filter based on the selected price range
-      switch (priceRange) {
-        case "0-500":
-          filter.price = { $gte: 0, $lte: 500 };
-          break;
-        case "500-1000":
-          filter.price = { $gte: 500, $lte: 1000 };
-          break;
-        case "1000-2000":
-          filter.price = { $gte: 1000, $lte: 2000 };
-          break;
-        case "2000-5000":
-          filter.price = { $gte: 2000, $lte: 5000 };
-          break;
-        case "5000+":
-          filter.price = { $gte: 5000 };
-          break;
-        default:
-          // "All" or unrecognized price range means no filtering by price
-          break;
+      // Validate minPrice and maxPrice
+      if (!minPrice || !maxPrice) {
+        return res.status(400).json({ message: 'minPrice and maxPrice are required.' });
       }
   
+      const min = Number(minPrice);
+      const max = Number(maxPrice);
+  
+      // Validate that min and max are numbers and min <= max
+      if (isNaN(min) || isNaN(max) || min > max) {
+        return res.status(400).json({ message: 'Invalid price range provided.' });
+      }
+  
+      // Create filter object for price range
+      const filter = {
+        price: { $gte: min, $lte: max }
+      };
+  
       // Fetch and sort products by price within the specified range
-      const products = await productModel.find(filter).sort({ price: 1 });
+      const products = await productModel.find(filter)
+        .sort({ price: 1 })
+        .select('name price images category discount priceAfterDiscount'); // Project only necessary fields
   
       // Respond with sorted and filtered products
-      res.status(200).json(products);
+      res.status(200).json({success : true, products});
     } catch (error) {
-      res.status(500).json({ message: 'Server error', error });
+      console.error('Error fetching products:', error); // Log the error for debugging
+      res.status(500).json({ message: 'Server error', error: error.message });
     }
   };
   const storage = multer.diskStorage({

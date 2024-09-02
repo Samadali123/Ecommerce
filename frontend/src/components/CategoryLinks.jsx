@@ -15,8 +15,8 @@ function CategoryLinks() {
     { link: 'Home', img: 'https://rukminim1.flixcart.com/flap/480/450/image/4be8a679014497f0.png?q=20' ,id:6},
     { link: 'Cosmetics', img: 'https://rukminim1.flixcart.com/flap/480/450/image/6ecb75e51b607880.jpg?q=20',id:7 },
     { link: 'Home', img: 'https://rukminim1.flixcart.com/flap/480/450/image/89d809684711712a.jpg?q=20', id:8 },
-    { link: 'Travel', img: 'https://rukminim1.flixcart.com/fk-p-flap/480/450/image/4b0a064d53b4ff28.jpg?q=20', id:9 },
-    { link: 'Grocery', img: 'https://rukminim1.flixcart.com/flap/480/450/image/356d37e9512c7fcb.jpg?q=20' , id:10}
+    { link: 'flights & hotels', img: 'https://rukminim1.flixcart.com/fk-p-flap/480/450/image/4b0a064d53b4ff28.jpg?q=20', id:9 },
+    { link: 'Nutrition & more', img: 'https://rukminim1.flixcart.com/flap/480/450/image/356d37e9512c7fcb.jpg?q=20' , id:10}
   ];
   const navigate = useNavigate(); 
   const [loading, setLoading] = useState(true);
@@ -43,7 +43,7 @@ function CategoryLinks() {
   };
 
   return (
-    <div className="mt-[3.1rem] mb-2 sm:mt-[1rem] lg:mt-1">
+    <div className="mt-[1rem] mb-2 sm:mt-[1rem] lg:mt-1">
       <div className="bg-white sm:px-8 lg:px-16 shadow-2xl">
         <div className="container mx-auto py-2 sm:py-4">
           <div className="flex overflow-x-auto no-scrollbar lg:justify-between">

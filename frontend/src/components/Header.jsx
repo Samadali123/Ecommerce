@@ -68,9 +68,13 @@ const Header = () => {
     };
 
     return (
-        <header className="bg-gradient-to-r from-blue-500 to-purple-500 px-4 py-2 flex justify-between items-center" style={{ height: '8vh' }}>
+        <header className="bg-gradient-to-r from-blue-500 to-purple-500  px-4 py-2 h-[8vh] " >
+            <div className='max-w-screen-xl mx-auto flex justify-between items-center'>
             <div className="flex items-center">
-                <div to='/'  className="text-white cursor-pointer text-2xl font-bold">My Shopee</div>
+            <div to='/' className="text-white cursor-pointer  sm:text-xl md:text-2xl font-bold">
+    My Shopee
+</div>
+
             </div>
             <div className="relative flex-grow mx-4" style={{ maxWidth: '40vw' }}>
                 <div className="relative">
@@ -113,7 +117,7 @@ const Header = () => {
                     </div>
                 )}
             </div>
-            <div className="flex items-center space-x-6">
+            <div className="flex  items-center space-x-6">
                 <Link to="/viewcart" className="text-white hover:text-gray-200 flex items-center space-x-2">
                     <FiShoppingCart style={{ fontSize: '1.5rem' }} />
                     <span style={{ fontSize: '1rem' }}>Cart</span>
@@ -122,10 +126,19 @@ const Header = () => {
                     className="relative"
                     onMouseEnter={handleMouseEnter}
                 >
-                    <Link to="#" className="text-white hover:text-gray-200 flex items-center space-x-2">
+                    {token ? (
+                        <Link to="#" className="text-white hover:text-gray-200 flex items-center space-x-2">
+                        <FaRegUser style={{ fontSize: '1.5rem' }} />
+                        <span style={{ fontSize: '1rem' }}>Logout</span>
+                    </Link>
+
+                    ):(
+                        <Link to="#" className="text-white hover:text-gray-200 flex items-center space-x-2">
                         <FaRegUser style={{ fontSize: '1.5rem' }} />
                         <span style={{ fontSize: '1rem' }}>Login</span>
                     </Link>
+                    )}
+                    
                     {isDropdownVisible && (
                         <div className="absolute right-0 z-[999] mt-2 w-48 bg-white border border-gray-300 shadow-lg rounded-lg"
                             onMouseLeave={handleMouseLeave}
@@ -145,6 +158,7 @@ const Header = () => {
                         </div>
                     )}
                 </div>
+            </div>
             </div>
         </header>
     );
