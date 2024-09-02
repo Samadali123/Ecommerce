@@ -86,7 +86,7 @@ const Loginadmin = () => {
   return (
     <>
     <Header2/>
-    <div className="flex items-center justify-center min-h-screen bg-gray-100 px-4 py-8">
+    <div className="flex items-center justify-center h-full bg-gray-100 px-4 py-8">
         <div className="bg-white p-6 sm:p-8 md:p-10 rounded-lg shadow-lg md:shadow-xl w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl">
           <h2 className="text-xl sm:text-2xl font-bold text-blue-700 mb-4 sm:mb-6 text-left">Admin Login </h2>
           <form className="space-y-4" onSubmit={handleSubmit}>

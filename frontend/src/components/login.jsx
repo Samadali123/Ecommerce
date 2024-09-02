@@ -14,6 +14,8 @@ import Header2 from './header2';
 
 const Login = () => {
   const [isAuthenticated, setIsAuthenticated] = useContext(UserContext);
+  const [response, setresponse] = useState("")
+  // const [googleapiresponse, setgoogleapiresponse] = useState("")
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: '',
@@ -41,6 +43,7 @@ const Login = () => {
         password: formData.password,
       });
 
+      setresponse(response)
       console.log('Login successful:', response.data);
       Cookies.set('token', response.data.token, { expires: 1 / 24 });
       setIsAuthenticated(true);
@@ -48,6 +51,7 @@ const Login = () => {
     } catch (err) {
       console.error('Login error:', err.response ? err.response.data : err.message);
       setError('Email or password is incorrect. Please try again.');
+      toast.error(response.data.message)
       setTimeout(() => {
         setError(null);
       }, 1000);
@@ -64,6 +68,7 @@ const Login = () => {
         email: data.email,
         isAdmin: false,
       });
+      // googleapiresponse(response)
 
       console.log('Google login successful:', response.data);
       Cookies.set('token', response.data.token, { expires: 1 / 24 });
@@ -78,6 +83,7 @@ const Login = () => {
     } catch (error) {
       console.error('Error during Google login:', error);
       setError('Google login failed. Please try again.');
+      // toast.error(googleapiresponse.data.message)
     }
   };
 
@@ -85,7 +91,7 @@ const Login = () => {
     <>
     <Header2/>
 
-      <div className="flex items-center justify-center min-h-screen bg-gray-100 px-4 py-8">
+      <div className="flex items-center justify-center h-full bg-gray-100 px-4 py-8">
         <div className="bg-white p-6 sm:p-8 md:p-10 rounded-lg shadow-lg md:shadow-xl w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl">
           <h2 className="text-xl sm:text-2xl font-bold text-blue-700 mb-4 sm:mb-6 text-left">Login to Your Account</h2>
           <form className="space-y-4" onSubmit={handleSubmit}>
@@ -127,7 +133,7 @@ const Login = () => {
             {error && <p className="text-red-500 text-sm">{error}</p>}
             <button
               type="submit"
-              className={`w-full py-3 text-white rounded-lg mt-4 flex items-center justify-center transition-all duration-300 ${loading ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'
+              className={`w-full py-3 text-white rounded-lg mt-4 flex items-center justify-center transition-all duration-300 ${loading ? 'bg-[#8763F6]' : 'bg-blue-600 hover:bg-blue-700'
                 }`}
               disabled={loading}
             >

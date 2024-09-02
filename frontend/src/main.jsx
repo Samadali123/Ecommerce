@@ -22,5 +22,4 @@ ReactDOM.createRoot(document.getElementById('root')).render(
          </AdminProvider>
          <ToastContainer/>
         </BrowserRouter>
-
 )

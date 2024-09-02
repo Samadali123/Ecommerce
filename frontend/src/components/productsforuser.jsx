@@ -41,11 +41,12 @@ const Productsforuser = () => {
     const [dropdownOpenCategory, setDropdownOpenCategory] = useState(false);
     const [dropdownOpenPrice, setDropdownOpenPrice] = useState(false);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
-    const [error, setError] = useState(null);
+    // const [error, setError] = useState(null);
     const dropdownRefCategory = useRef(null);
     const dropdownTriggerRefCategory = useRef(null);
-    const dropdownRefPrice = useRef(null);
-    const dropdownTriggerRefPrice = useRef(null);
+    const [minPrice, setminPrice] = useState()
+    const [maxPrice, setmaxPrice] = useState()
+
     const { id } = useParams();
     const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
 
@@ -53,9 +54,32 @@ const Productsforuser = () => {
         "All", "0-500", "500-1000", "1000-2000", "2000-5000", "5000+"
     ];
 
+    const filterProductsByPrice = async () => {
+        // Check if minPrice or maxPrice are not set
+        if (minPrice === "" || minPrice === null  || maxPrice === "" || maxPrice === null) {
+            toast.info("PLease Set a Price Range.")
+            return; // Exit the function early if the condition is met
+        }
+      
+
+        try {
+            // Perform the API call with the correct query parameters
+            const response = await axios.get(`/products/filterproducts?minPrice=${minPrice}&maxPrice=${maxPrice}`);
+            console.log(response.data);
+            if(response.data.success){
+                setProducts(response.data.products)
+            }
+            // Handle the response as needed (e.g., update the products state)
+            // setProducts(response.data);
+        } catch (error) {
+            // Handle any errors that occur during the API request
+            console.error("Error fetching filtered products:", error);
+        }
+    };
+    
 
     useEffect(() => {
-        const fetchProducts = async (category) => {
+         let  fetchProducts = async (category) => {
             // const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
 
             try {
@@ -64,7 +88,7 @@ const Productsforuser = () => {
                 setProducts(response.data.products);
             } catch (error) {
                 // console.error('Error fetching products:', error);
-                setError('Failed to load products.');
+                // setError('Failed to load products.');
                 toast.info('No Products Found For This Category.');
             } finally {
                 setLoading(false);
@@ -73,12 +97,6 @@ const Productsforuser = () => {
 
         fetchProducts(selectedCategory);
     }, [selectedCategory]);
-    // const handlePriceRangeSelect = (priceRange) => {
-    //     setSelectedPriceRange(priceRange);
-    //     navigate(`/productsforuser?category=${selectedCategory}&filterproducts=${priceRange}`);
-    //     setDropdownOpenPrice(false);
-    //     setSelectedProduct(null);
-    // };
 
     // Handle category selection
     const handleCategorySelect = (category) => {
@@ -107,31 +125,13 @@ const Productsforuser = () => {
             console.error('Error adding product to cart:', error);
         }
     };
-    const handleDropdownTogglePrice = () => {
-        setDropdownOpenPrice(prevState => !prevState);
-    };
+
 
     // Toggle dropdown visibility
     const handleDropdownToggle = () => {
         setDropdownOpen(prevState => !prevState);
     };
-    const handlePriceRangeSelect = async (priceRange) => {
-        setSelectedPriceRange(priceRange);
-        setDropdownOpenPrice(false);
-
-        try {
-            // Send the selected price range to the backend
-            const response = await axios.get(`/products/filterproducts?filterproducts=${priceRange}`);
-            const sortedProducts = response.data.price;
-
-            // Handle the sorted products (e.g., update state or redirect to another page)
-            // Example: navigate to the products page with sorted products
-            navigate('/productsforuser', { state: { sortedProducts } });
-        } catch (error) {
-            console.error('Error fetching sorted products:', error);
-        }
-    };
-
+  
     // Close dropdown when clicking outside of it
     const handleClickOutside = (event) => {
         if (
@@ -156,6 +156,9 @@ const Productsforuser = () => {
             setCurrentImageIndex(newIndex);
         }
     };
+
+
+   
 
     return (
         <div className="flex flex-col min-h-screen bg-gray-100">
@@ -197,32 +200,16 @@ const Productsforuser = () => {
                         </div>
                     )}
                 </button>
-                <button
-            className="relative ml-4 text-blue-700 flex gap-3 p-2 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-100 focus:outline-none"
-            onClick={handleDropdownTogglePrice}
-            ref={dropdownTriggerRefPrice}
-        >
-            Price Filter
-            <LuListFilter className="w-6 h-6" />
+            
 
-            {dropdownOpenPrice && (
-                <div className="absolute mt-8 left-1 w-48 bg-white shadow-lg rounded-lg z-20" ref={dropdownRefPrice}>
-                    <ul className="space-y-2 p-2">
-                        {priceRanges.map(range => (
-                            <li key={range}>
-                                <button
-                                    onClick={() => handlePriceRangeSelect(range)}
-                                    className={`w-full p-2 rounded-lg text-left ${selectedPriceRange === range ? 'bg-blue-800 text-white' : 'bg-gray-200 text-gray-700'} hover:bg-blue-700 hover:text-white transition duration-300`}
-                                >
-                                    {range}
-                                </button>
-                            </li>
-                        ))}
-                    </ul>
+                <div className="price-buttons flex gap-3 ml-3">
+                <input onChange={(e)=> setminPrice(e.target.value)} value={minPrice} type="number" placeholder='minPrice'  className=" outline-0  rounded-lg px-1 w-fit " />
+                <input onChange={(e)=> setmaxPrice(e.target.value)}  value={maxPrice} type="number" placeholder='maxPrice' className=' outline-0 rounded-lg px-1 w-fit' />
+                <button onClick={filterProductsByPrice}  className=' px-1 text-sm text-blue-500 font-medium '>Apply</button>
                 </div>
-            )}
-        </button>
 
+
+            
             </div>
 
             {/* Product Grid */}
@@ -327,3 +314,7 @@ const Productsforuser = () => {
 };
 
 export default Productsforuser;
+
+
+
+

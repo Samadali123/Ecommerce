@@ -3,24 +3,24 @@ import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import { ClipLoader } from 'react-spinners';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from '../utils/axios';
 import Header2 from './header2';
-import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 const SingleProduct = () => {
     const [product, setProduct] = useState(null);
     const [similarProducts, setSimilarProducts] = useState([]);
-    const [moreProducts, setmoreProducts] = useState([]);
+    const [moreProducts, setMoreProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [zoomedImage, setZoomedImage] = useState(null);
     const { id } = useParams();
     const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
+    const navigate = useNavigate();
+
     const handleViewProductClick = (productId) => {
         navigate(`/singleproduct/${productId}`);
     };
-    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchProductData = async () => {
@@ -29,10 +29,8 @@ const SingleProduct = () => {
                 setProduct(response.data.product);
                 if (response.data.similarProducts && response.data.similarProducts.length > 0) {
                     setSimilarProducts(response.data.similarProducts);
-                } else {
-                    if (response.data.moreProducts && response.data.moreProducts.length > 0) {
-                        setmoreProducts(response.data.moreProducts);
-                    }
+                } else if (response.data.moreProducts && response.data.moreProducts.length > 0) {
+                    setMoreProducts(response.data.moreProducts);
                 }
             } catch (error) {
                 console.error('Error fetching product data:', error);
@@ -44,9 +42,9 @@ const SingleProduct = () => {
         fetchProductData();
     }, [id]);
 
-    const handleAddToCart = async (id, token) => {
+    const handleAddToCart = async (productId) => {
         try {
-            const response = await axios.post(`/users/user/cart/add?token=${token}`, { productId: id });
+            await axios.post(`/users/user/cart/add?token=${token}`, { productId });
             toast.success('Product added successfully!');
         } catch (error) {
             console.error('Error adding product to cart:', error);
@@ -122,7 +120,7 @@ const SingleProduct = () => {
                                 </div>
                                 <div className="flex justify-center items-center gap-4 mb-6">
                                     {product.colors && product.colors.map((color, index) => (
-                                        <div key={index} className={`w-8 h-8 rounded-full cursor-pointer`} style={{ backgroundColor: color }} />
+                                        <div key={index} className="w-8 h-8 rounded-full cursor-pointer" style={{ backgroundColor: color }} />
                                     ))}
                                 </div>
                             </>
@@ -148,13 +146,13 @@ const SingleProduct = () => {
                         </div>
                         <div className="flex gap-4">
                             <button
-                                onClick={() => handleAddToCart(product._id, token)}
+                                onClick={() => handleAddToCart(product._id)}
                                 className="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-800 transition duration-300"
                             >
                                 Buy Now
                             </button>
                             <button
-                                onClick={() => handleAddToCart(product._id, token)}
+                                onClick={() => handleAddToCart(product._id)}
                                 className="bg-blue-700 text-white py-2 px-4 rounded-lg hover:bg-blue-900 transition duration-300"
                             >
                                 Add to Cart
@@ -175,7 +173,7 @@ const SingleProduct = () => {
                     ) : (
                         <Slider {...similarSettings}>
                             {(similarProducts && similarProducts.length > 0 ? similarProducts : moreProducts).map((product) => (
-                                <div key={product.id} className="p-4">
+                                <div key={product._id} className="p-4">
                                     <div className="bg-white rounded-lg shadow-lg overflow-hidden">
                                         <div className="flex justify-center items-center h-48">
                                             <img
@@ -201,24 +199,6 @@ const SingleProduct = () => {
                     )}
                 </div>
 
-<<<<<<< HEAD
-                        className="bg-blue-700 text-white py-2 px-4 rounded-lg hover:bg-blue-900 transition duration-300"
-                    >
-                        Add to Cart
-                    </button>
-                </div>
-            </div>
-
-            {/* Similar Products Carousel */}
-            <div className="mt-12 scroll">
-                
-                <h3 className="text-2xl font-bold mb-6 ml-8">
-                    {similarProducts && similarProducts.length > 0  ? "Similar Products " :  "More Products"}
-                    </h3>
-                {loading ? (
-                    <div className="flex justify-center items-center h-64">
-                        <ClipLoader color="#007bff" size={50} />
-=======
                 {/* Zoomed Image Modal */}
                 {zoomedImage && (
                     <div className="modal">
@@ -226,7 +206,6 @@ const SingleProduct = () => {
                             <button onClick={() => setZoomedImage(null)}>X</button>
                             <img src={zoomedImage} alt="Zoomed" />
                         </div>
->>>>>>> 78051357154b8ad202158ad6067ac98f4e8e5777
                     </div>
                 )}
             </div>
