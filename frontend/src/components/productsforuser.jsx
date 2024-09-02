@@ -34,12 +34,32 @@ const Productsforuser = () => {
     const query = new URLSearchParams(location.search);
     const initialCategory = query.get('category') || "All";
     const initialPriceRange = query.get('price') || "All";
+<<<<<<< HEAD
+=======
+
+    const [selectedCategory, setSelectedCategory] = useState(initialCategory);
+    const [selectedPriceRange, setSelectedPriceRange] = useState(initialPriceRange);
+    const [selectedProduct, setSelectedProduct] = useState(null);
+    const [products, setProducts] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [dropdownOpenCategory, setDropdownOpenCategory] = useState(false);
+    const [dropdownOpenPrice, setDropdownOpenPrice] = useState(false);
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    // const [error, setError] = useState(null);
+    const dropdownRefCategory = useRef(null);
+    const dropdownTriggerRefCategory = useRef(null);
+    const [minPrice, setminPrice] = useState()
+    const [maxPrice, setmaxPrice] = useState()
+
+    const { id } = useParams();
+>>>>>>> 7c0e93e00febba9ffe22a2756a329814e09d5ac2
     const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
 
     const handleDropdownToggle = () => {
         setDropdownOpen(prevState => !prevState);
     };
 
+<<<<<<< HEAD
     const handleDropdownTogglePrice = () => {
         setDropdownOpenPrice(prevState => !prevState);
     };
@@ -104,12 +124,48 @@ const Productsforuser = () => {
 
     useEffect(() => {
         const fetchProducts = async (category) => {
+=======
+    const filterProductsByPrice = async () => {
+        // Check if minPrice or maxPrice are not set
+        if (minPrice === "" || minPrice === null  || maxPrice === "" || maxPrice === null) {
+            toast.info("PLease Set a Price Range.")
+            return; // Exit the function early if the condition is met
+        }
+      
+
+        try {
+            // Perform the API call with the correct query parameters
+            const response = await axios.get(`/products/filterproducts?minPrice=${minPrice}&maxPrice=${maxPrice}`);
+            console.log(response.data);
+            if(response.data.success){
+                setProducts(response.data.products)
+            }
+            // Handle the response as needed (e.g., update the products state)
+            // setProducts(response.data);
+        } catch (error) {
+            // Handle any errors that occur during the API request
+            console.error("Error fetching filtered products:", error);
+        }
+    };
+    
+
+    useEffect(() => {
+         let  fetchProducts = async (category) => {
+            // const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
+
+>>>>>>> 7c0e93e00febba9ffe22a2756a329814e09d5ac2
             try {
                 const endpoint = category === "All" ? "/products/all" : `/products/category?category=${category}`;
                 const response = await axios.get(endpoint);
                 setProducts(response.data.products);
             } catch (error) {
+<<<<<<< HEAD
                 toast.info('No products found for this category.');
+=======
+                // console.error('Error fetching products:', error);
+                // setError('Failed to load products.');
+                toast.info('No Products Found For This Category.');
+>>>>>>> 7c0e93e00febba9ffe22a2756a329814e09d5ac2
             } finally {
                 setLoading(false);
             }
@@ -137,6 +193,30 @@ const Productsforuser = () => {
         fetchProductsByPrice();
     }, [minPrice, maxPrice]);
 
+<<<<<<< HEAD
+=======
+        try {
+            console.log(id);
+            const response = await axios.post(
+                `/users/user/cart/add?token=${token}`, { productId: id });
+
+            // Handle the response as needed
+            console.log('Product added to cart:', response.data);
+            toast.success('Product added successfully!');
+        } catch (error) {
+            // Handle any errors
+            console.error('Error adding product to cart:', error);
+        }
+    };
+
+
+    // Toggle dropdown visibility
+    const handleDropdownToggle = () => {
+        setDropdownOpen(prevState => !prevState);
+    };
+  
+    // Close dropdown when clicking outside of it
+>>>>>>> 7c0e93e00febba9ffe22a2756a329814e09d5ac2
     const handleClickOutside = (event) => {
         if (dropdownRef.current && !dropdownRef.current.contains(event.target) &&
             dropdownTriggerRef.current && !dropdownTriggerRef.current.contains(event.target)) {
@@ -159,6 +239,9 @@ const Productsforuser = () => {
     const dropdownTriggerRef = useRef(null);
     const dropdownRefPrice = useRef(null);
     const dropdownTriggerRefPrice = useRef(null);
+
+
+   
 
     return (
         <div className="flex flex-col min-h-screen bg-gray-100">
@@ -199,6 +282,7 @@ const Productsforuser = () => {
                             </ul>
                         </div>
                     )}
+<<<<<<< HEAD
                 </button> 
 
                 <button
@@ -266,6 +350,19 @@ const Productsforuser = () => {
                         </div>
                     )}
                 </button>
+=======
+                </button>
+            
+
+                <div className="price-buttons flex gap-3 ml-3">
+                <input onChange={(e)=> setminPrice(e.target.value)} value={minPrice} type="number" placeholder='minPrice'  className=" outline-0  rounded-lg px-1 w-fit " />
+                <input onChange={(e)=> setmaxPrice(e.target.value)}  value={maxPrice} type="number" placeholder='maxPrice' className=' outline-0 rounded-lg px-1 w-fit' />
+                <button onClick={filterProductsByPrice}  className=' px-1 text-sm text-blue-500 font-medium '>Apply</button>
+                </div>
+
+
+            
+>>>>>>> 7c0e93e00febba9ffe22a2756a329814e09d5ac2
             </div>
 
              {/* Product Grid */}
@@ -375,3 +472,10 @@ const Productsforuser = () => {
 };
 
 export default Productsforuser;
+<<<<<<< HEAD
+=======
+
+
+
+
+>>>>>>> 7c0e93e00febba9ffe22a2756a329814e09d5ac2

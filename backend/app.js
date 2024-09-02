@@ -8,8 +8,11 @@ const usersRoutes = require("./routes/userRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const productRoutes = require("./routes/productRoutes");
 const cartRoutes = require("./routes/cartRoutes");
+const wishlistRoutes =  require("./routes/wishlistRoutes");
+
 const cors = require("cors");
 const wishlistRoutes =  require("./routes/wishlistRoutes");
+
 
 // Set up a database connection
 require("./config/db.config").DbConnection();

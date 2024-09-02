@@ -3,141 +3,16 @@ const productModel = require("../models/product.model");
 const multer = require('multer');
 const path = require('path');
 
+// const cloudinary = require('../config/cloudinary');
+// const upload = require('../utils/multer');
+
 
 const numberWithCommas = (number) => {
     return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
 
 
-// exports.addProduct = async (req, res) => {
-//     try {
-//       const { name, description, price, category, stock, discount } = req.body;
-  
-//       // Check if all required fields are present
-//       if (!name || !description || !price || !category || !stock || !discount) {
-//         return res.status(400).json({ success: false, message: "Please fill in all product details" });
-//       }
-  
-//       // Sanitize and validate price
-//       let sanitizedPrice = parseFloat(price.replace(/,/g, '')); // Remove commas and convert to number
-//       if (isNaN(sanitizedPrice) || sanitizedPrice < 0) {
-//         return res.status(400).json({ success: false, message: "Price must be a valid number greater than or equal to 0" });
-//       }
-  
-//       // Sanitize and validate discount
-//       let numericDiscount = parseFloat(discount);
-//       if (isNaN(numericDiscount) || numericDiscount < 0 || numericDiscount > 100) {
-//         return res.status(400).json({ success: false, message: "Discount must be a number between 0 and 100" });
-//       }
-  
-//       // Calculate the final price after discount
-//       let finalPrice = sanitizedPrice;
-//       if (numericDiscount > 0) {
-//         finalPrice = sanitizedPrice - (sanitizedPrice * (numericDiscount / 100));
-//       }
-  
-//       // Collect image file paths from req.files
-//       const images = req.files.map(file => file.filename);
-  
-//       // Create a new product
-//       const newProduct = await productModel.create({
-//         name,
-//         description,
-//         price: sanitizedPrice,
-//         priceAfterDiscount: finalPrice,
-//         category,
-//         stock,
-//         images,
-//         discount: numericDiscount,
-//       });
-  
-//       // Send the created product as JSON
-//       res.status(201).json({
-//         success: true,
-//         newProduct
-//       });
-  
-//     } catch (error) {
-//       console.error('Error creating product:', error);
-//       res.status(500).json({ success: false, message: "Internal Server Error" });
-//     }
-//   };
-
-
-exports.addProduct = async (req, res) => {
-    try {
-      const { name, description, price, category, stock, discount } = req.body;
-  
-      // Check if all required fields are present
-      if (!name || !description || !price || !category || !stock || !discount) {
-        return res.status(400).json({ success: false, message: "Please fill in all product details" });
-      }
-  
-      // Predefined list of valid categories
-      const validCategories = [
-        'Electronics', 'Clothing', 'Home', 'Cosmetics', 
-        'Mens', 'Womens', 'Kids', 'Sports'
-      ];
-  
-      // Validate category against the predefined list
-      if (!validCategories.includes(category)) {
-        return res.status(400).json({ success: false, message: "Invalid category" });
-      }
-  
-      // Sanitize and validate price
-      let sanitizedPrice = parseFloat(price.replace(/,/g, '')); // Remove commas and convert to number
-      if (isNaN(sanitizedPrice) || sanitizedPrice < 0) {
-        return res.status(400).json({ success: false, message: "Price must be a valid number greater than or equal to 0" });
-      }
-  
-      // Sanitize and validate discount
-      let numericDiscount = parseFloat(discount);
-      if (isNaN(numericDiscount) || numericDiscount < 0 || numericDiscount > 100) {
-        return res.status(400).json({ success: false, message: "Discount must be a number between 0 and 100" });
-      }
-  
-      // Calculate the final price after discount
-      let finalPrice = sanitizedPrice;
-      if (numericDiscount > 0) {
-        finalPrice = sanitizedPrice - (sanitizedPrice * (numericDiscount / 100));
-      }
-  
-      // Validate images
-      if (!req.files || req.files.length === 0) {
-        return res.status(400).json({ success: false, message: "Please upload at least one image" });
-      }
-  
-      // Collect image file paths from req.files
-      const images = req.files.map(file => file.filename);
-  
-      // Create a new product
-      const newProduct = await productModel.create({
-        name,
-        description,
-        price: sanitizedPrice,
-        priceAfterDiscount: finalPrice,
-        category,
-        stock,
-        images,
-        discount: numericDiscount,
-      });
-  
-      // Send the created product as JSON
-      res.status(201).json({
-        success: true,
-        newProduct
-      });
-  
-    } catch (error) {
-      console.error('Error creating product:', error);
-      res.status(500).json({ success: false, message: "Internal Server Error" });
-    }
-  };
-  
-
-  
-
-exports.totalproducts = async (req, res, next) => {
+exports.totalProducts = async (req, res, next) => {
     // Function to format numbers with commas
     const numberWithCommas = (number) => {
         return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -174,7 +49,7 @@ exports.totalproducts = async (req, res, next) => {
 
 
 
-exports.singleproduct = async (req, res, next) => {
+exports.singleProduct = async (req, res, next) => {
     // Function to format numbers with commas
     const numberWithCommas = (number) => {
         return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -248,71 +123,7 @@ exports.singleproduct = async (req, res, next) => {
 
 
 
-
-
-exports.updateproduct = async (req, res, next) => {
-    // Function to format numbers with commas
-    const numberWithCommas = (number) => {
-        return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-    };
-
-    try {
-        // Extract product ID from request parameters
-        const productId = req.params.id || req.query.productId;
-        const updates = req.body;
-
-        // Check if the product ID is valid and provided
-        if (!productId) {
-            return res.status(400).json({ success: false, message: "Product ID is required" });
-        }
-
-        // Validate and sanitize fields if provided
-        if (updates.price) {
-            updates.price = parseFloat(updates.price.replace(/,/g, ''));
-            if (isNaN(updates.price) || updates.price < 0) {
-                return res.status(400).json({ success: false, message: "Invalid price value" });
-            }
-        }
-
-        if (updates.discount) {
-            updates.discount = parseFloat(updates.discount);
-            if (isNaN(updates.discount) || updates.discount < 0 || updates.discount > 100) {
-                return res.status(400).json({ success: false, message: "Discount must be between 0 and 100" });
-            }
-        }
-
-        // Update the product
-        const updatedProduct = await productModel.findByIdAndUpdate(productId, updates, {
-            new: true,
-            runValidators: true
-        }).exec();
-
-        // Check if the product was found and updated
-        if (!updatedProduct) {
-            return res.status(404).json({ success: false, message: "Product not found" });
-        }
-
-        // Format prices with commas if they were updated
-        const formattedProduct = {
-            ...updatedProduct.toObject(),
-            price: numberWithCommas(updatedProduct.price),
-            priceAfterDiscount: updatedProduct.priceAfterDiscount ? numberWithCommas(updatedProduct.priceAfterDiscount) : undefined
-        };
-
-        // Send the response
-        res.status(200).json({
-            success: true,
-            product: formattedProduct
-        });
-
-    } catch (error) {
-        console.error('Error updating product:', error);
-        res.status(500).json({ success: false, message: "Internal Server Error" });
-    }
-};
-
-
-exports.deleteproduct = async (req, res, next) => {
+exports.deleteProduct = async (req, res, next) => {
     try {
         // Extract product ID from request parameters
         const productId = req.params.id;
@@ -485,6 +296,7 @@ exports.searchProducts = async (req, res, next) => {
 
 };
 
+<<<<<<< HEAD
 exports.sortProducts = async (req, res, next) => {
     try {
       // Get price range from query parameters
@@ -530,18 +342,87 @@ exports.sortProducts = async (req, res, next) => {
 });
 const upload = multer({ storage: storage });
   exports.uploadImages = upload.array('images',5);
+=======
+//   const storage = multer.diskStorage({
+//     destination: function (req, file, cb) {
+//         cb(null, 'uploads/images'); // Set the destination folder for the images
+//     },
+//     filename: function (req, file, cb) {
+//         cb(null, Date.now() + path.extname(file.originalname)); // Set the file name
+//     }
+// });
+// const upload = multer({ storage: storage });
+
+//  exports.uploadImages = upload.array('images',5);
+
+
+// exports.addProduct = async (req, res) => {
+//     try {
+//       const { name, description, price, category, stock, discount } = req.body;
+  
+//       // Check if all required fields are present
+//       if (!name || !description || !price || !category || !stock || !discount) {
+//         return res.status(400).json({ success: false, message: "Please fill in all product details" });
+//       }
+  
+//       // Sanitize and validate price
+//       let sanitizedPrice = parseFloat(price.replace(/,/g, '')); // Remove commas and convert to number
+//       if (isNaN(sanitizedPrice) || sanitizedPrice < 0) {
+//         return res.status(400).json({ success: false, message: "Price must be a valid number greater than or equal to 0" });
+//       }
+  
+//       // Sanitize and validate discount
+//       let numericDiscount = parseFloat(discount);
+//       if (isNaN(numericDiscount) || numericDiscount < 0 || numericDiscount > 100) {
+//         return res.status(400).json({ success: false, message: "Discount must be a number between 0 and 100" });
+//       }
+  
+//       // Calculate the final price after discount
+//       let finalPrice = sanitizedPrice;
+//       if (numericDiscount > 0) {
+//         finalPrice = sanitizedPrice - (sanitizedPrice * (numericDiscount / 100));
+//       }
+  
+//       // Collect image file paths from req.files
+//       const images = req.files.map(file => file.filename);
+  
+//       // Create a new product
+//       const newProduct = await productModel.create({
+//         name,
+//         description,
+//         price: sanitizedPrice,
+//         priceAfterDiscount: finalPrice,
+//         category,
+//         stock,
+//         images,
+//         discount: numericDiscount,
+//       });
+  
+//       // Send the created product as JSON
+//       res.status(201).json({
+//         success: true,
+//         newProduct
+//       });
+  
+//     } catch (error) {
+//       console.error('Error creating product:', error);
+//       res.status(500).json({ success: false, message: "Internal Server Error" });
+//     }
+//   };
+
+>>>>>>> 7c0e93e00febba9ffe22a2756a329814e09d5ac2
 
 exports.addProduct = async (req, res) => {
     try {
       const { name, description, price, category, stock, discount } = req.body;
   
-      // Check if all required fields are present
+      // Validate product details
       if (!name || !description || !price || !category || !stock || !discount) {
         return res.status(400).json({ success: false, message: "Please fill in all product details" });
       }
   
       // Sanitize and validate price
-      let sanitizedPrice = parseFloat(price.replace(/,/g, '')); // Remove commas and convert to number
+      let sanitizedPrice = parseFloat(price.replace(/,/g, ''));
       if (isNaN(sanitizedPrice) || sanitizedPrice < 0) {
         return res.status(400).json({ success: false, message: "Price must be a valid number greater than or equal to 0" });
       }
@@ -558,10 +439,10 @@ exports.addProduct = async (req, res) => {
         finalPrice = sanitizedPrice - (sanitizedPrice * (numericDiscount / 100));
       }
   
-      // Collect image file paths from req.files
-      const images = req.files.map(file => file.filename);
+      // Get Cloudinary image URLs
+      const images = req.files.map(file => file.path); // Cloudinary stores the URL in `file.path`
   
-      // Create a new product
+      // Create a new product in the database
       const newProduct = await productModel.create({
         name,
         description,
@@ -573,14 +454,52 @@ exports.addProduct = async (req, res) => {
         discount: numericDiscount,
       });
   
-      // Send the created product as JSON
+      // Respond with the created product
       res.status(201).json({
         success: true,
-        newProduct
+        newProduct,
       });
   
     } catch (error) {
       console.error('Error creating product:', error);
       res.status(500).json({ success: false, message: "Internal Server Error" });
+    }
+  };
+
+  
+
+  exports.sortProducts = async (req, res, next) => {
+    try {
+      // Get price range from query parameters
+      const { minPrice, maxPrice } = req.query;
+  
+      // Validate minPrice and maxPrice
+      if (!minPrice || !maxPrice) {
+        return res.status(400).json({ message: 'minPrice and maxPrice are required.' });
+      }
+  
+      const min = Number(minPrice);
+      const max = Number(maxPrice);
+  
+      // Validate that min and max are numbers and min <= max
+      if (isNaN(min) || isNaN(max) || min > max) {
+        return res.status(400).json({ message: 'Invalid price range provided.' });
+      }
+  
+      // Create filter object for price range
+      const filter = {
+        price: { $gte: min, $lte: max }
+      };
+  
+      // Fetch and sort products by price within the specified range
+      const products = await productModel.find(filter)
+        .sort({ price: 1 })
+        .select('name price images category discount priceAfterDiscount'); // Project only necessary fields
+  
+      // Respond with sorted and filtered products
+      res.status(200).json({success : true, products});
+    } catch (error) {
+      console.error('Error fetching products:', error); // Log the error for debugging
+      res.status(500).json({ message: 'Server error', error: error.message });
     }
   };

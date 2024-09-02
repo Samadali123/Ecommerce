@@ -15,8 +15,17 @@ const SingleProduct = () => {
     const [loading, setLoading] = useState(true);
     const [zoomedImage, setZoomedImage] = useState(null);
     const { id } = useParams();
+<<<<<<< HEAD
     const navigate = useNavigate();
     const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
+=======
+    const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
+    const navigate = useNavigate();
+
+    const handleViewProductClick = (productId) => {
+        navigate(`/singleproduct/${productId}`);
+    };
+>>>>>>> 7c0e93e00febba9ffe22a2756a329814e09d5ac2
 
     useEffect(() => {
         const fetchProductData = async () => {
@@ -40,9 +49,13 @@ const SingleProduct = () => {
         fetchProductData();
     }, [id, token]);
 
-    const handleAddToCart = async (id, token) => {
+    const handleAddToCart = async (productId) => {
         try {
+<<<<<<< HEAD
             await axios.post(`/users/user/cart/add?token=${token}`, { productId: id });
+=======
+            await axios.post(`/users/user/cart/add?token=${token}`, { productId });
+>>>>>>> 7c0e93e00febba9ffe22a2756a329814e09d5ac2
             toast.success('Product added successfully!');
         } catch (error) {
             console.error('Error adding product to cart:', error);
@@ -146,12 +159,16 @@ const SingleProduct = () => {
                                 </div>
                                 <div className="flex justify-center items-center gap-4 mb-6">
                                     {product.colors && product.colors.map((color, index) => (
+<<<<<<< HEAD
                                         <div
                                             key={index}
                                             className={`w-8 h-8 rounded-full cursor-pointer border-2 border-gray-300`}
                                             style={{ backgroundColor: color }}
                                             aria-label={`Color ${color}`}
                                         />
+=======
+                                        <div key={index} className="w-8 h-8 rounded-full cursor-pointer" style={{ backgroundColor: color }} />
+>>>>>>> 7c0e93e00febba9ffe22a2756a329814e09d5ac2
                                     ))}
                                 </div>
                             </>
@@ -179,16 +196,26 @@ const SingleProduct = () => {
                         </div>
                         <div className="flex gap-4">
                             <button
+<<<<<<< HEAD
                                 onClick={() => handleBuyNow(product._id, token)}
                                 className={`bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-800 transition duration-300 ${product?.stock <= 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
                                 disabled={product?.stock <= 0}
+=======
+                                onClick={() => handleAddToCart(product._id)}
+                                className="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-800 transition duration-300"
+>>>>>>> 7c0e93e00febba9ffe22a2756a329814e09d5ac2
                             >
                                 Buy Now
                             </button>
                             <button
+<<<<<<< HEAD
                                 onClick={() => handleAddToCart(product._id, token)}
                                 className={`bg-blue-700 text-white py-2 px-4 rounded-lg hover:bg-blue-900 transition duration-300 ${product?.stock <= 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
                                 disabled={product?.stock <= 0}
+=======
+                                onClick={() => handleAddToCart(product._id)}
+                                className="bg-blue-700 text-white py-2 px-4 rounded-lg hover:bg-blue-900 transition duration-300"
+>>>>>>> 7c0e93e00febba9ffe22a2756a329814e09d5ac2
                             >
                                 Add to Cart
                             </button>
@@ -207,7 +234,11 @@ const SingleProduct = () => {
                         </div>
                     ) : (
                         <Slider {...similarSettings}>
+<<<<<<< HEAD
                             {(similarProducts.length > 0 ? similarProducts : moreProducts).map((product) => (
+=======
+                            {(similarProducts && similarProducts.length > 0 ? similarProducts : moreProducts).map((product) => (
+>>>>>>> 7c0e93e00febba9ffe22a2756a329814e09d5ac2
                                 <div key={product._id} className="p-4">
                                     <div className="bg-white rounded-lg shadow-lg overflow-hidden">
                                         <div className="flex justify-center items-center h-48">

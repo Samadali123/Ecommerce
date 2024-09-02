@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+
+>>>>>>> 7c0e93e00febba9ffe22a2756a329814e09d5ac2
 const mongoose = require('mongoose');
 
 // Order schema to keep track of orders
@@ -30,4 +34,8 @@ const orderSchema = new mongoose.Schema({
 
 
 
+<<<<<<< HEAD
 module.exports = mongoose.model("Order", orderSchema);
+=======
+module.exports = mongoose.model("Order", orderSchema);
+>>>>>>> 7c0e93e00febba9ffe22a2756a329814e09d5ac2

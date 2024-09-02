@@ -13,7 +13,6 @@ const ResetPassword = () => {
 
   // Extract the token from the cookie
   const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -23,16 +22,15 @@ const ResetPassword = () => {
     }
 
     try {
-      const response = await axios.put('/users/user/resetpassword', {
+      const response = await axios.put(`/users/user/resetpassword?token=${token}`, {
         currentPassword,
         newPassword,
         confirmPassword,
-        token
       });
 
       setMessageResponse(response.data.message);
       toast.success('Password reset successful.');
-      navigate('/login');
+      navigate('/');
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'Error resetting password. Please try again.';
       console.error('Reset password error:', error);
@@ -43,7 +41,7 @@ const ResetPassword = () => {
   return (
     <>
     <Header2/>
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
+    <div className="flex justify-center items-center h-full bg-gray-100">
       <div className="w-full max-w-md p-8 bg-white shadow-lg rounded-lg">
         <h2 className="text-2xl font-semibold mb-6 text-gray-800">Reset Password</h2>
         <form onSubmit={handleSubmit} className="space-y-4">

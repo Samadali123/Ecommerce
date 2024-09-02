@@ -67,6 +67,9 @@ const Register = () => {
     } catch (err) {
       console.error('Registration error:', err.response ? err.response.data : err.message);
       setError('Registration failed. Please try again.');
+      if(err.response ? err.response.data : err.message === "User already registered"){
+        toast.error("User Already registered")
+      }
     } finally {
       setLoading(false);
     }
@@ -95,7 +98,7 @@ const Register = () => {
   return (
     <>
     <Header2/>
-    <div className="flex items-center justify-center min-h-screen bg-gray-100 px-4">
+    <div className="flex items-center justify-center  h-full bg-gray-100 px-4">
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
         <h2 className="text-2xl font-bold text-blue-700 mb-6 text-left">Register Account</h2>
         <form className="space-y-4" onSubmit={handleSubmit}>
