@@ -15,9 +15,6 @@ router.put("/remove", UserIsLoggedIn, removeFromWishlist)
 router.get("/view", UserIsLoggedIn,  userWishlist)
 
 
-<<<<<<< HEAD
-module.exports = router;
-=======
 module.exports = router;
 
 
@@ -26,4 +23,3 @@ module.exports = router;
 
 
 
->>>>>>> 7c0e93e00febba9ffe22a2756a329814e09d5ac2

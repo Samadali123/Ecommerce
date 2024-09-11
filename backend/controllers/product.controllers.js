@@ -296,53 +296,6 @@ exports.searchProducts = async (req, res, next) => {
 
 };
 
-<<<<<<< HEAD
-exports.sortProducts = async (req, res, next) => {
-    try {
-      // Get price range from query parameters
-      const { minPrice, maxPrice } = req.query;
-  
-      // Validate minPrice and maxPrice
-      if (!minPrice || !maxPrice) {
-        return res.status(400).json({ message: 'minPrice and maxPrice are required.' });
-      }
-  
-      const min = Number(minPrice);
-      const max = Number(maxPrice);
-  
-      // Validate that min and max are numbers and min <= max
-      if (isNaN(min) || isNaN(max) || min > max) {
-        return res.status(400).json({ message: 'Invalid price range provided.' });
-      }
-  
-      // Create filter object for price range
-      const filter = {
-        price: { $gte: min, $lte: max }
-      };
-  
-      // Fetch and sort products by price within the specified range
-      const products = await productModel.find(filter)
-        .sort({ price: 1 })
-        .select('name price images category discount priceAfterDiscount'); // Project only necessary fields
-  
-      // Respond with sorted and filtered products
-      res.status(200).json({success : true, products});
-    } catch (error) {
-      console.error('Error fetching products:', error); // Log the error for debugging
-      res.status(500).json({ message: 'Server error', error: error.message });
-    }
-  };
-  const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, 'uploads/'); // Set the destination folder for the images
-    },
-    filename: function (req, file, cb) {
-        cb(null, Date.now() + path.extname(file.originalname)); // Set the file name
-    }
-});
-const upload = multer({ storage: storage });
-  exports.uploadImages = upload.array('images',5);
-=======
 //   const storage = multer.diskStorage({
 //     destination: function (req, file, cb) {
 //         cb(null, 'uploads/images'); // Set the destination folder for the images
@@ -410,7 +363,6 @@ const upload = multer({ storage: storage });
 //     }
 //   };
 
->>>>>>> 7c0e93e00febba9ffe22a2756a329814e09d5ac2
 
 exports.addProduct = async (req, res) => {
     try {

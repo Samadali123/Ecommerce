@@ -68,10 +68,6 @@ exports.userWishlist = async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: "Server error", error: error.message });
     }
-<<<<<<< HEAD
-}
-=======
 }
 
 
->>>>>>> 7c0e93e00febba9ffe22a2756a329814e09d5ac2

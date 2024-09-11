@@ -98,7 +98,7 @@ const Register = () => {
   return (
     <>
     <Header2/>
-    <div className="flex items-center justify-center  h-full bg-gray-100 px-4">
+    <div className="flex items-center justify-center  h-full  px-4">
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
         <h2 className="text-2xl font-bold text-blue-700 mb-6 text-left">Register Account</h2>
         <form className="space-y-4" onSubmit={handleSubmit}>

@@ -325,8 +325,4 @@ exports.checkout = async (req, res) => {
     }
 };
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 7c0e93e00febba9ffe22a2756a329814e09d5ac2
 

@@ -26,12 +26,14 @@ import ViewCart from '../components/viewcart.jsx';
 import Orders from '../components/Orders.jsx';
 import Customers from '../components/customers.jsx';
 import Reports from '../components/Reports.jsx';
+import Search from '../components/Search.jsx';
 
 
 
 const routes = () => {
     return (
-        
+        <>
+        <div  className='bg-grid'></div>
         <Routes>
             <Route path="/" element={<Home/>}></Route>
             <Route path="/" element={<Home/>}></Route>
@@ -54,8 +56,10 @@ const routes = () => {
             <Route path='/orders' element={<Orders/>}></Route>
             <Route path='/customers' element={<Customers/>}></Route>
             <Route path='/reports' element={<Reports/>}></Route>
+            <Route path='/search' element={<Search/>}></Route>
             <Route path="*" element={<NotFound/>}></Route>    
-            </Routes>    
+            </Routes>   
+            </>
     )
 }
 

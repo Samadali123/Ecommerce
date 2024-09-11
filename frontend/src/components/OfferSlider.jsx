@@ -32,6 +32,7 @@ const offers = [
     alt: "Offer 3",
     link: "",
   },
+  
 ];
 
 const OfferSlider = () => {
@@ -97,7 +98,7 @@ const OfferSlider = () => {
                   isLargeScreen
                     ? "w-full h-60 object-top object-cover"
                     : "w-full h-auto"
-                } rounded-md shadow-md`}
+                }  shadow-md`}
               />
             </Link>
           </div>

@@ -11,7 +11,6 @@ const cartRoutes = require("./routes/cartRoutes");
 const wishlistRoutes =  require("./routes/wishlistRoutes");
 
 const cors = require("cors");
-const wishlistRoutes =  require("./routes/wishlistRoutes");
 
 
 // Set up a database connection
