@@ -566,7 +566,7 @@ const Registeradmin = () => {
   return (
     <>
     <Header/>
-     <div className="flex items-center justify-center  bg-gray-100 px-4">
+     <div className="flex items-center justify-center   px-4">
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
         <h2 className="text-2xl font-bold text-blue-700 mb-6">Register Account</h2>
         {error && (

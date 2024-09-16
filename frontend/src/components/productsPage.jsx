@@ -63,10 +63,10 @@ const ProductsPage = () => {
               <img
                 src={product.images[0]}
                 alt={product.name}
-                className="w-full h-48 object-cover mb-4 rounded"
+                className="w-full h-48 object-contain mb-4 rounded"
               />
-              <h2 className="text-xl font-semibold mb-2">{product.name}</h2>
-              <p className="text-gray-600 mb-2">{product.description}</p>
+              <h2 className="text-xl font-semibold mb-2 line-clamp-1">{product.name}</h2>
+              <p className="text-gray-600 mb-2 line-clamp-3">{product.description}</p>
               <p className="text-lg font-bold">{product.price}</p>
               {product.discount > 0 && (
                 <p className="text-sm text-red-500 mb-2">Discount: {product.discount}%</p>

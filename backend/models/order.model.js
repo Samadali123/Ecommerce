@@ -1,3 +1,10 @@
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+
+>>>>>>> 7c0e93e00febba9ffe22a2756a329814e09d5ac2
+>>>>>>> a510549819e888a1e067be7bc5decd95b76f1591
 const mongoose = require('mongoose');
 
 // Order schema to keep track of orders
@@ -63,4 +70,13 @@ const orderSchema = new mongoose.Schema({
     timestamps: true // Automatically adds createdAt and updatedAt fields
 });
 
+<<<<<<< HEAD
+=======
+
+
+<<<<<<< HEAD
+>>>>>>> a510549819e888a1e067be7bc5decd95b76f1591
 module.exports = mongoose.model("Order", orderSchema);
+=======
+module.exports = mongoose.model("Order", orderSchema);
+>>>>>>> 7c0e93e00febba9ffe22a2756a329814e09d5ac2

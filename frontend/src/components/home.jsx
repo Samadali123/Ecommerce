@@ -78,7 +78,7 @@ const Home = () => {
   // }, []);
 
   return (
-    <div className="home bg-gray-100 text-gray-800 overflow-x-hidden overflow-y-auto">
+    <div className="home  text-gray-800 overflow-x-hidden overflow-y-auto">
       {/* Header */}
       <div ref={headerRef}>
         <Header />

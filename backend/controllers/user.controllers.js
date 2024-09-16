@@ -232,6 +232,43 @@ exports.getUserProfile = async (req, res) => {
         res.status(500).json({ success: false, message: "Server error", error: error.message });
     }
 };
+exports.currentUser = async (req, res, next)=>{
+    try {
+         const user = await userModel.findOne({email : req.user.email})
+         if(! user) return res.status(403).json({success : false, message : "User not Found! "})
+         res.status(200).json({success : true, user})
+    } catch (error) {
+         res.status(error.status).json({success : false, message : error.message})
+    }
+}
+
+
+exports.getUserProfile = async (req, res) => {
+    try {
+        // Fetch the logged-in user's email from the request object (assuming JWT middleware adds this)
+        const loginUserEmail = req.user.email;
+
+        // Find the user by their email, excluding the password field
+        const user = await userModel
+            .findOne({ email: loginUserEmail })
+            .select('-password') // Exclude the password field
+            .populate("mycart")
+            .populate("wishlist");
+
+        // If the user is not found, return an error
+        if (!user) {
+            return res.status(404).json({ success: false, message: "Login User not found" });
+        }
+
+        // Send back the user's profile details
+        res.status(200).json({
+            success: true,
+            user
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Server error", error: error.message });
+    }
+};
 
 
 
