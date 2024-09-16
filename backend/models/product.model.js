@@ -42,6 +42,10 @@ const productSchema = new Schema({
         min: [0, 'Discount must be between 0 and 100'],
         max: [100, 'Discount must be between 0 and 100']
     },
+    reviews: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Review'
+      }],
 
 }, { timestamps: true });
 

@@ -1,7 +1,8 @@
 
 const express = require('express');
-const { registeraccount, loginaccount, logoutaccount, adminaccount, loginWithGoogle, forgotPassword, updatePassword, changePassword, currentUser, getUserProfile, checkout } = require('../controllers/user.controllers');
+const { registeraccount, loginaccount, logoutaccount, adminaccount, loginWithGoogle, forgotPassword, updatePassword, changePassword, currentUser, getUserProfile, checkout, editProfileImage } = require('../controllers/user.controllers');
 const { UserIsLoggedIn } = require('../middlewares/auth.middleware');
+const upload = require("../utils/multer");
 const router = express.Router();
 
 //register account
@@ -31,10 +32,10 @@ router.get("/currentuser", UserIsLoggedIn, currentUser)
 ///profile
 router.get("/profile", UserIsLoggedIn, getUserProfile);
 
-
+// /checkout
 router.get("/checkout", UserIsLoggedIn, checkout);
 
-
-
+// /edit/profile
+router.put("/edit/profile",upload.single("image"), editProfileImage)
 
 module.exports = router;
