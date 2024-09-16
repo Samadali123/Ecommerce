@@ -27,6 +27,8 @@ import Orders from '../components/Orders.jsx';
 import Customers from '../components/customers.jsx';
 import Reports from '../components/Reports.jsx';
 import Search from '../components/Search.jsx';
+import Wishlist from '../components/wishlist.jsx';
+import Productsfortest from '../components/Productsfortest.jsx';
 
 
 
@@ -57,6 +59,8 @@ const routes = () => {
             <Route path='/customers' element={<Customers/>}></Route>
             <Route path='/reports' element={<Reports/>}></Route>
             <Route path='/search' element={<Search/>}></Route>
+            <Route path='/wishlist' element={<Wishlist/>}></Route>
+            <Route path='/test' element={<Productsfortest/>}></Route>
             <Route path="*" element={<NotFound/>}></Route>    
             </Routes>   
             </>

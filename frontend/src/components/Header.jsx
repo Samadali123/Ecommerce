@@ -61,6 +61,7 @@ const Header = () => {
         setSearchTerm('');
         setSuggestions([]);
     };
+    
 
     const handleMouseEnter = () => {
         setIsDropdownVisible(true);
@@ -152,7 +153,8 @@ const Header = () => {
                     )}
                 </div>
                 <div className="flex items-center space-x-6 hidden md:flex">
-                    <Link to="/viewcart" onClick={toggleSidebar} className="relative block text-xl font-semibold text-white">
+
+                    <Link to="/viewcart"  onClick={toggleSidebar} className="relative block text-xl font-semibold text-white">
                         <FaShoppingCart className="inline-block mr-2" />
                         {/* Badge */}
                         <span className="absolute top-0 right-0 block w-4 h-4 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
@@ -180,9 +182,9 @@ const Header = () => {
                                             <FaUser className="mr-2" /> {/* User icon */}
                                             My Profile
                                         </Link>
-                                        <Link to="/wishlist" className="block px-4 py-2 hover:bg-gray-100 flex items-center">
-                                            <FaHeart className="mr-2" /> {/* Heart icon */}
-                                            Wishlist (34)
+                                        <Link to="/wishlist" className="block px-4 py-2 hover:text-red-700 hover:bg-gray-100 flex items-center">
+                                            <FaHeart className="mr-2 hover:text-red-700" /> {/* Heart icon */}
+                                            Wishlist
                                         </Link>
                                         <Link to="/orders" className="block px-4 py-2 hover:bg-gray-100 flex items-center">
                                             <FaBox className="mr-2" /> {/* Box icon */}
@@ -236,13 +238,13 @@ const Header = () => {
                             <Link to="/viewcart" onClick={toggleSidebar} className="block text-lg font-semibold text-gray-700 hover:text-blue-500">
                                 <FaShoppingCart className="inline-block mr-2" /> Cart
                             </Link>
-                            <Link to="/resetpassword" onClick={toggleSidebar} className="block text-lg font-semibold text-gray-700 hover:text-blue-500">
+                            <Link to="/profile" onClick={toggleSidebar} className="block text-lg font-semibold text-gray-700 hover:text-blue-500">
                                 <FaUser className="inline-block mr-2" /> My Profile
                             </Link>
-                            <Link to="/resetpassword" onClick={toggleSidebar} className="block text-lg font-semibold text-gray-700 hover:text-blue-500">
+                            <Link to="/wishlist" onClick={toggleSidebar} className="block text-lg font-semibold text-gray-700 hover:text-blue-500">
                                 <FaHeart className="inline-block mr-2" /> Wishlist 34
                             </Link>
-                            <Link to="/resetpassword" onClick={toggleSidebar} className="block text-lg font-semibold text-gray-700 hover:text-blue-500">
+                            <Link to="/orders" onClick={toggleSidebar} className="block text-lg font-semibold text-gray-700 hover:text-blue-500">
                                 <FaBox className="inline-block mr-2" /> Orders
                             </Link>
                             <Link to="/resetpassword" onClick={toggleSidebar} className="block text-lg font-semibold text-gray-700 hover:text-blue-500">

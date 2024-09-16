@@ -17,7 +17,7 @@ function CategoryLinks() {
     { link: 'Cosmetics', img: 'https://rukminim1.flixcart.com/flap/480/450/image/6ecb75e51b607880.jpg?q=20',id:7 },
     { link: 'Home', img: 'https://rukminim1.flixcart.com/flap/480/450/image/89d809684711712a.jpg?q=20', id:8 },
     { link: 'flights & hotels', img: 'https://rukminim1.flixcart.com/fk-p-flap/480/450/image/4b0a064d53b4ff28.jpg?q=20', id:9 },
-    { link: 'Nutrition & more', img: 'https://rukminim2.flixcart.com/flap/80/80/image/dff3f7adcf3a90c6.png?q=100' , id:10}
+    { link: 'Kids', img: 'https://rukminim2.flixcart.com/flap/80/80/image/dff3f7adcf3a90c6.png?q=100' , id:10}
   ];
   const navigate = useNavigate(); 
   const [loading, setLoading] = useState(true);
@@ -26,15 +26,16 @@ function CategoryLinks() {
   const handleCategoryClick = async (category) => {
     try {
       // Navigate to the Products page with the selected category
-      
       navigate(`/productsforuser?category=${category}`);
       
       // Fetch products for the selected category
-      const endpoint = category === "All" ? "/products/all" : `/products/category?category=${category}`;
+      const endpoint = category === "All" ? `/products/all` : `/products/category?category=${category}`;
       const response = await axios.get(endpoint);
-      // console.log(response.data)
-      setProducts(response?.data?.products);
-      console.log(products) 
+
+      setProducts(response.data.products);
+      console.log(response.data);
+      setProducts([]);
+      setProducts(response.data.products)
     } catch (error) {
       console.error('Error fetching products:', error);
       setError('Failed to load products.');
@@ -43,7 +44,6 @@ function CategoryLinks() {
       setLoading(false);
     }
   };
-
   return (
     <div className="mt-[1rem]  sm:mt-[1rem] lg:mt-1">
       <div className="bg-white sm:px-8 lg:px-16 shadow-2xl">

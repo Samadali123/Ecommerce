@@ -50,6 +50,22 @@ const Homeproduct = () => {
             toast.error('Failed to add product to cart.');
         }
     };
+    const handleAddToWishlist = async (productId) => {
+        if (!token) {
+            toast.info('Please log in first to add products to the wishlist.');
+            alert("Please log in first to add products to the wishlist.");
+            navigate("/login")
+            return; // Exit the function if no token is present
+        }
+    
+        try {
+            await axios.put(`/user/wishlist/add?token=${token}`, { productId });
+            toast.success('Product added successfully!');
+        } catch (error) {
+            console.error('Error adding product to cart:', error);
+            toast.error('Failed to add product to cart.');
+        }
+    };
     
 
     // Filtering functions
@@ -86,7 +102,7 @@ const Homeproduct = () => {
                     <div onClick={() => handleAddToCart(product._id)} className="w-8 h-8 cursor-pointer rounded-full border border-gray-400 flex justify-center items-center hover:bg-gray-100 transition">
                         <FaShoppingCart className="text-gray-600 hover:text-yellow-500" />
                     </div>
-                    <div className="w-8 h-8 rounded-full border border-gray-400 cursor-pointer flex justify-center items-center hover:bg-gray-100 transition">
+                    <div onClick={() => handleAddToWishlist(product._id)} className="w-8 h-8 rounded-full border border-gray-400 cursor-pointer flex justify-center items-center hover:bg-gray-100 transition">
                         <FaHeart className="text-gray-600 hover:text-red-500" />
                     </div>
                     <div onClick={() => navigate(`/singleproduct/${product._id}`)} className="w-8 h-8 cursor-pointer rounded-full border border-gray-400 flex justify-center items-center hover:bg-gray-100 transition">

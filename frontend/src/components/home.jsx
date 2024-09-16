@@ -104,6 +104,7 @@ const Home = () => {
       {/* Footer */}
       <div ref={footerRef}>
         <Footer />
+        
       </div>
     </div>
   );

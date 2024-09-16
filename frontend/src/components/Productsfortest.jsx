@@ -16,7 +16,8 @@ const categories = [
     "Kids", "Footwears", "Cosmetics", "Mens", "Womens"
 ];
 
-const Productsforuser = () => {
+const Productsfortest = () => {
+    const [dropdownOpen, setDropdownOpen] = useState(false);
     const [dropdownOpenPrice, setDropdownOpenPrice] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState("All");
     const [products, setProducts] = useState([]);
@@ -34,6 +35,10 @@ const Productsforuser = () => {
     const initialPriceRange = query.get('price') || "All";
     const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
 
+    const handleDropdownToggle = () => {
+        setDropdownOpen(prevState => !prevState);
+    };
+
     const handleDropdownTogglePrice = () => {
         setDropdownOpenPrice(prevState => !prevState);
     };
@@ -41,6 +46,7 @@ const Productsforuser = () => {
     const handleCategorySelect = (category) => {
         setSelectedCategory(category);
         navigate(`/productsforuser?category=${category}`);
+        setDropdownOpen(false);
         setSelectedProduct(null);
     };
 
@@ -76,11 +82,29 @@ const Productsforuser = () => {
         }
     };
 
+    // const handleAddToCart = async (productId) => {
+    //     if (!token) {
+    //         toast.info('Please log in to add items to your cart.');
+    //         return;
+    //     }
+
+    //     try {
+    //         const response = await axios.post(`/users/user/cart/add?token=${token}`, { productId });
+    //         if (response.data.success) {
+    //             toast.success('Product added to cart successfully!');
+    //         } else {
+    //             toast.error('Failed to add product to cart.');
+    //         }
+    //     } catch (error) {
+    //         console.error("Error adding product to cart:", error);
+    //         toast.error('Error adding product to cart.');
+    //     }
+    // };
     const handleAddToCart = async (productId) => {
         if (!token) {
             toast.info('Please log in first to add products to the cart.');
             alert("Please log in first to add products to the cart.");
-            navigate("/login");
+            navigate("/login")
             return; // Exit the function if no token is present
         }
         try {
@@ -91,23 +115,9 @@ const Productsforuser = () => {
             toast.error('Failed to add product to cart.');
         }
     };
-    // useEffect(() => {
-    //     // Parse category from URL parameters
-    //     const queryParams = new URLSearchParams(location.search);
-    //     const category = queryParams.get('category') || "All";
-        
-    //     // Set selectedCategory based on URL query param
-    //     setSelectedCategory(category);
-    //   }, [location]);
-
     useEffect(() => {
         const fetchProducts = async (category) => {
             try {
-                const queryParams = new URLSearchParams(location.search);
-        const category = queryParams.get('category') || "All";
-        
-        // Set selectedCategory based on URL query param
-        setSelectedCategory(category);
                 const endpoint = category === "All" ? "/products/all" : `/products/category?category=${category}`;
                 const response = await axios.get(endpoint);
                 setProducts(response.data.products);
@@ -119,7 +129,7 @@ const Productsforuser = () => {
         };
 
         fetchProducts(selectedCategory);
-    }, [selectedCategory],[location]);
+    }, [selectedCategory]);
 
     useEffect(() => {
         const fetchProductsByPrice = async () => {
@@ -129,6 +139,7 @@ const Productsforuser = () => {
                     if (response.data.success) {
                         setProducts(response.data.products);
                         setNoProductsFound(response.data.products.length === 0);
+
                     }
                 } catch (error) {
                     console.error("Error fetching filtered products:", error);
@@ -139,9 +150,35 @@ const Productsforuser = () => {
         fetchProductsByPrice();
     }, [minPrice, maxPrice]);
 
+    const handleClickOutside = (event) => {
+        if (dropdownRef.current && !dropdownRef.current.contains(event.target) &&
+            dropdownTriggerRef.current && !dropdownTriggerRef.current.contains(event.target)) {
+            setDropdownOpen(false);
+        }
+        if (dropdownRefPrice.current && !dropdownRefPrice.current.contains(event.target) &&
+            dropdownTriggerRefPrice.current && !dropdownTriggerRefPrice.current.contains(event.target)) {
+            setDropdownOpenPrice(false);
+        }
+    };
+
+    useEffect(() => {
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
+
+    const dropdownRef = useRef(null);
+    const dropdownTriggerRef = useRef(null);
+    const dropdownRefPrice = useRef(null);
+    const dropdownTriggerRefPrice = useRef(null);
+    const backtohome = () =>{
+        navigate("/");
+    }
+
     return (
         <div className="flex flex-col min-h-screen bg-gray-100">
-            {/* Custom Header */}
+            {/*  Custom Header*/}
             <Header2 />
 
             {/* Loader Overlay */}
@@ -151,102 +188,140 @@ const Productsforuser = () => {
                 </div>
             )}
 
-            {/* Main Layout with Sidebar */}
-            <div className="flex flex-col lg:flex-row mt-4 ml-8 lg:mb-0">
-                {/* Sidebar Filter */}
-                <aside className="w-[85vw] lg:w-64 h-[107vh] lg:h-[100vh] mt-8 bg-white shadow-md p-4 mb-4 lg:mb-0">
-                    {/* Categories */}
-                    <h2 className="text-lg font-bold mb-4">Categories</h2>
-                    <ul className="space-y-2">
-                        {categories.map(category => (
-                            <li key={category}>
-                                <button
-                                    onClick={() => handleCategorySelect(category)}
-                                    className={`w-full p-2 rounded-lg text-left ${selectedCategory === category ? 'bg-blue-800 text-white' : 'bg-gray-200 text-gray-700'} hover:bg-blue-700 hover:text-white transition duration-300`}
-                                >
-                                    {category}
-                                </button>
-                            </li>
-                        ))}
-                    </ul>
+            {/* Category Filter */}
+            <div className="relative flex  mt-4  ml-8 lg:mb-0">
+            <FaArrowLeft onClick={backtohome} className="text-gray-500 mx-2 mt-2 hover:text-gray-700 cursor-pointer mr-2" size={24} />
+                <button
+                    className="relative text-blue-700 flex gap-3 p-2 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-100 focus:outline-none"
+                    onClick={handleDropdownToggle}
+                    ref={dropdownTriggerRef}
+                >
+                    Category Filter
+                    <LuListFilter className="w-6 h-6" />
 
-                    {/* Price Filter */}
-                    <h2 className="text-lg font-bold mt-8 mb-4">Price</h2>
-                    <div>
-                        <Range
-                            values={priceRange}
-                            step={100}
-                            min={0}
-                            max={500000}
-                            onChange={handlePriceRangeChange}
-                            renderTrack={({ props, children }) => (
-                                <div
-                                    {...props}
-                                    style={{
-                                        ...props.style,
-                                        height: '6px',
-                                        width: '100%',
-                                        background: getTrackBackground({
-                                            values: priceRange,
-                                            colors: ['#ccc', '#007bff', '#ccc'],
-                                            min: 0,
-                                            max: 500000,
-                                        }),
-                                    }}
-                                >
-                                    {children}
-                                </div>
-                            )}
-                            renderThumb={({ props }) => (
-                                <div
-                                    {...props}
-                                    style={{
-                                        ...props.style,
-                                        height: '24px',
-                                        width: '24px',
-                                        borderRadius: '50%',
-                                        backgroundColor: '#007bff',
-                                        display: 'flex',
-                                        justifyContent: 'center',
-                                        alignItems: 'center',
-                                    }}
-                                >
-                                    <div style={{ width: '10px', height: '10px', backgroundColor: '#fff', borderRadius: '50%' }} />
-                                </div>
-                            )}
-                        />
-                        <div className="flex justify-between mt-2 text-sm text-gray-700">
-                            <span>{priceRange[0]}</span>
-                            <span>{priceRange[1]}</span>
+                    {/* Dropdown Menu */}
+                    {dropdownOpen && (
+                        <div className="absolute mt-8 left-1 w-48 bg-white shadow-lg rounded-lg z-20" ref={dropdownRef}>
+                            <ul className="space-y-2 p-2">
+                                {categories.map(category => (
+                                    <li key={category}>
+                                        <button
+                                            onClick={() => handleCategorySelect(category)}
+                                            className={`w-full p-2 rounded-lg text-left ${selectedCategory === category ? 'bg-blue-800 text-white' : 'bg-gray-200 text-gray-700'} hover:bg-blue-700 hover:text-white transition duration-300`}
+                                        >
+                                            {category}
+                                        </button>
+                                    </li>
+                                ))}
+                            </ul>
                         </div>
-                        <button
-                            onClick={handleApplyPriceFilter}
-                            className="mt-4 w-full py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
-                        >
-                            Apply
-                        </button>
-                    </div>
-                </aside>
+                    )}
+                </button>
 
-                {/* Product Grid */}
-                <main className="flex-1 p-4 lg:p-8">
-                    <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6">
-                        {noProductsFound ? (
-                            <h3 className="text-xl text-center font-semibold text-gray-700">No products found in this price range.</h3>
-                        ) : (
-                            products.map(product => (
-                                <div
+                <button
+                    className="relative ml-4 text-blue-700 flex gap-3 p-2 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-100 focus:outline-none"
+                    onClick={handleDropdownTogglePrice}
+                    ref={dropdownTriggerRefPrice}
+                >
+                    Price Filter
+                    <LuListFilter className="w-6 h-6" />
+
+                    {dropdownOpenPrice && (
+                        <div className="absolute mt-8 left-1 w-64 bg-white shadow-lg rounded-lg z-20 p-4" ref={dropdownRefPrice}>
+                            <Range
+                                values={priceRange}
+                                step={100}
+                                min={0}
+                                max={500000}
+                                onChange={handlePriceRangeChange}
+                                renderTrack={({ props, children }) => (
+                                    <div
+                                        {...props}
+                                        style={{
+                                            ...props.style,
+                                            height: '6px',
+                                            width: '100%',
+                                            background: getTrackBackground({
+                                                values: priceRange,
+                                                colors: ['#ccc', '#007bff', '#ccc'],
+                                                min: 0,
+                                                max: 500000,
+                                            }),
+                                        }}
+                                    >
+                                        {children}
+                                    </div>
+                                )}
+                                renderThumb={({ props }) => (
+                                    <div
+                                        {...props}
+                                        style={{
+                                            ...props.style,
+                                            height: '24px',
+                                            width: '24px',
+                                            borderRadius: '50%',
+                                            backgroundColor: '#007bff',
+                                            display: 'flex',
+                                            justifyContent: 'center',
+                                            alignItems: 'center',
+                                        }}
+                                    >
+                                        <div style={{ width: '10px', height: '10px', backgroundColor: '#fff', borderRadius: '50%' }} />
+                                    </div>
+                                )}
+                            />
+                            <div className="flex justify-between mt-2 text-sm text-gray-700">
+                                <span>{priceRange[0]}</span>
+                                <span>{priceRange[1]}</span>
+                            </div>
+                            <button
+                                onClick={handleApplyPriceFilter}
+                                className="mt-4 w-full py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                            >
+                                Apply
+                            </button>
+                        </div>
+                    )}
+                </button>
+            </div>
+
+            {/* Product Grid */}
+            <main className="flex-1 p-4 lg:p-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    {noProductsFound ? (
+                        <h3 className="text-xl font-semibold text-gray-700">No products found in this price range.</h3>
+                    ) : (
+                        products.map(product => (
+                            // <div
+                            //     key={product.id}
+                            //     className="bg-white p-4 rounded-lg shadow-md border border-gray-300 hover:border-blue-500 hover:shadow-lg transition-all duration-300 cursor-pointer"
+                            //     onClick={() => {
+                            //         setSelectedProduct(product);
+                            //         setCurrentImageIndex(0); // Reset image index on new product selection
+                            //     }}
+                            // >
+                            //     <img src={product.images[0]} alt={product.name} className="w-full h-56 flex justify-center  items-center overflow-hidden rounded-t-lg" />
+                            //     <h3 className="text-lg font-semibold line-clamp-1 mb-2">{product.name}</h3>
+                            //     <p className="text-gray-600 mb-2">
+                            //         <p className='line-through'>{product.price}</p>
+                            //         {product.discount > 0 && (
+                            //             <p className="text-sm text-red-500 mb-1">{product.discount}% Off</p>
+                            //         )}
+                            //     </p>
+                            //     <p className="text-gray-800 text-xl font-bold">{product.priceAfterDiscount}</p>
+                            //     <button className="bg-blue-700 text-white py-1 px-3 rounded-lg mt-2 hover:bg-blue-900 transition duration-300">
+                            //         View Product
+                            //     </button>
+                            // </div>
+                            <div
                                 key={product.id}
-                                onClick={() => {
+                                onClick={() => {setSelectedProduct(product);
                                     setCurrentImageIndex(0);}}
-                                className="bg-white h-[55vh]  border  border-gray-300 rounded-lg shadow-sm hover:shadow-md transition-shadow  duration-300 ease-in-out transform hover:scale-105 group relative"
+                                className="bg-white h-[55vh]  border cursor-pointer border-gray-300 rounded-lg shadow-sm hover:shadow-md transition-shadow  duration-300 ease-in-out transform hover:scale-105 group relative"
                                 
                             >
                                 {/* Product Image */}
-                                <div onClick={() => {
-                                    setSelectedProduct(product);
-                                     setCurrentImageIndex(0); // Reset image index on new product selection
-                                 }} className="w-full h-56 cursor-pointer flex justify-center items-center overflow-hidden rounded-t-lg">
+                                <div className="w-full h-56 flex justify-center items-center overflow-hidden rounded-t-lg">
                                     <img
                                         src={product.images[0]}
                                         alt={product.name}
@@ -289,13 +364,13 @@ const Productsforuser = () => {
                                     </button>
                                 </div>
                             </div>
-                            ))
-                        )}
-                    </div>
-                </main>
-            </div>
-            
-            {/* Product Modal */}
+
+                        ))
+                    )}
+                </div>
+            </main>
+
+            {/* Product Detail Modal */}
             {selectedProduct && (
                 <div className="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50 p-4">
                     <div className="bg-white p-6 rounded-lg shadow-2xl w-full max-w-4xl relative overflow-y-auto max-h-full">
@@ -344,7 +419,7 @@ const Productsforuser = () => {
                             <div className="lg:w-1/2 lg:pl-8 mt-6 lg:mt-0 bg-white p-6 rounded-lg shadow-lg">
                                 <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-4">{selectedProduct.name}</h2>
 
-                                <p className="text-xl sm:text-2xl font-bold text-blue-600 mb-4">₹{selectedProduct.priceAfterDiscount}</p>
+                                <p className="text-xl sm:text-2xl font-bold text-blue-600 mb-4">${selectedProduct.priceAfterDiscount}</p>
 
                                 <p className="text-gray-700 text-sm sm:text-lg leading-relaxed mb-6">{selectedProduct.description}</p>
 
@@ -362,9 +437,10 @@ const Productsforuser = () => {
                 </div>
             )}
 
-            <ToastContainer position="top-right" autoClose={5000} hideProgressBar={false} newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover />
+
+            <ToastContainer />
         </div>
     );
 };
 
-export default Productsforuser;
+export default Productsfortest;

@@ -101,7 +101,7 @@ const Header2 = () => {
     }
 
     return (
-        <header className="bg-gradient-to-r w-full from-blue-500   to-purple-500 pt-4 px-4 py-2 h-[8vh]">
+        <header className="bg-gradient-to-r w-full from-blue-500   to-purple-500 pt-4 px-4 py-12 h-[8vh]">
             <div className="max-w-screen-xl mx-auto flex justify-between items-center">
                 <div className="flex  items-center">
                     <button className="text-white py-3 md:hidden" onClick={toggleSidebar}>
