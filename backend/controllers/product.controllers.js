@@ -1,10 +1,11 @@
 require("dotenv").config();
 const productModel = require("../models/product.model");
+const userModel = require("../models/user.model")
+const reviewModel = require("../models/review.model")
 const multer = require('multer');
 const path = require('path');
-
-// const cloudinary = require('../config/cloudinary');
-// const upload = require('../utils/multer');
+const cloudinary = require('../config/cloudinary');
+const upload = require('../utils/multer');
 
 
 const numberWithCommas = (number) => {
@@ -45,8 +46,6 @@ exports.totalProducts = async (req, res, next) => {
         res.status(500).json({ success: false, message: "Internal Server Error" });
     }
 };
-
-
 
 
 exports.singleProduct = async (req, res, next) => {
@@ -119,8 +118,6 @@ exports.singleProduct = async (req, res, next) => {
         res.status(500).json({ success: false, message: "Internal Server Error" });
     }
 };
-
-
 
 
 exports.deleteProduct = async (req, res, next) => {
@@ -257,6 +254,7 @@ exports.productByCategory = async (req, res, next) => {
     }
 };
 
+
 exports.searchProducts = async (req, res, next) => {
     try {
         const { query } = req.query; // Retrieve the search query from the request
@@ -295,73 +293,6 @@ exports.searchProducts = async (req, res, next) => {
 
 
 };
-
-//   const storage = multer.diskStorage({
-//     destination: function (req, file, cb) {
-//         cb(null, 'uploads/images'); // Set the destination folder for the images
-//     },
-//     filename: function (req, file, cb) {
-//         cb(null, Date.now() + path.extname(file.originalname)); // Set the file name
-//     }
-// });
-// const upload = multer({ storage: storage });
-
-//  exports.uploadImages = upload.array('images',5);
-
-
-// exports.addProduct = async (req, res) => {
-//     try {
-//       const { name, description, price, category, stock, discount } = req.body;
-  
-//       // Check if all required fields are present
-//       if (!name || !description || !price || !category || !stock || !discount) {
-//         return res.status(400).json({ success: false, message: "Please fill in all product details" });
-//       }
-  
-//       // Sanitize and validate price
-//       let sanitizedPrice = parseFloat(price.replace(/,/g, '')); // Remove commas and convert to number
-//       if (isNaN(sanitizedPrice) || sanitizedPrice < 0) {
-//         return res.status(400).json({ success: false, message: "Price must be a valid number greater than or equal to 0" });
-//       }
-  
-//       // Sanitize and validate discount
-//       let numericDiscount = parseFloat(discount);
-//       if (isNaN(numericDiscount) || numericDiscount < 0 || numericDiscount > 100) {
-//         return res.status(400).json({ success: false, message: "Discount must be a number between 0 and 100" });
-//       }
-  
-//       // Calculate the final price after discount
-//       let finalPrice = sanitizedPrice;
-//       if (numericDiscount > 0) {
-//         finalPrice = sanitizedPrice - (sanitizedPrice * (numericDiscount / 100));
-//       }
-  
-//       // Collect image file paths from req.files
-//       const images = req.files.map(file => file.filename);
-  
-//       // Create a new product
-//       const newProduct = await productModel.create({
-//         name,
-//         description,
-//         price: sanitizedPrice,
-//         priceAfterDiscount: finalPrice,
-//         category,
-//         stock,
-//         images,
-//         discount: numericDiscount,
-//       });
-  
-//       // Send the created product as JSON
-//       res.status(201).json({
-//         success: true,
-//         newProduct
-//       });
-  
-//     } catch (error) {
-//       console.error('Error creating product:', error);
-//       res.status(500).json({ success: false, message: "Internal Server Error" });
-//     }
-//   };
 
 
 exports.addProduct = async (req, res) => {
@@ -418,7 +349,6 @@ exports.addProduct = async (req, res) => {
     }
   };
 
-  
 
   exports.sortProducts = async (req, res, next) => {
     try {
@@ -455,3 +385,86 @@ exports.addProduct = async (req, res) => {
       res.status(500).json({ message: 'Server error', error: error.message });
     }
   };
+
+
+
+  exports.addReview = async (req, res) => {
+    try {
+      const { productId, rating, comment } = req.body;
+      const loginuser = await  userModel.findOne({email : req.user.email})
+        // Assuming you're using authentication
+       if(! loginuser){
+         return res.status(403).json({success : false, message : "Login user not found!"})
+       }
+      // Validate input fields
+      if (!productId || !rating || !comment) {
+        return res.status(400).json({ success: false, message: "All fields are required" });
+      }
+  
+      // Check if the product exists
+      const product = await productModel.findById(productId);
+      if (!product) {
+        return res.status(404).json({ success: false, message: "Product not found" });
+      }
+  
+      // Check if user already reviewed this product
+      const existingReview = await reviewModel.findOne({ user: loginuser._id, product: productId });
+      if (existingReview) {
+        return res.status(400).json({ success: false, message: "You have already reviewed this product" });
+      }
+  
+      // Create the new review
+      const review = await reviewModel.create({
+        user: loginuser._id,
+        product: productId,
+        rating,
+        comment
+      });
+  
+      // Update product's review stats (optional)
+      product.reviews.push(review._id);
+      await product.save();
+      await loginuser.save();
+  
+      // Send response
+      res.status(201).json({
+        success: true,
+        message: 'Review added successfully',
+        review
+      });
+    } catch (error) {
+      console.error('Error adding review:', error);
+      res.status(500).json({ success: false, message: "Internal Server Error" });
+    }
+  };
+
+
+  exports.getProductReviews = async (req, res) => {
+    try {
+      const { productId } = req.params || req.query;
+      // Check if the product exists
+      const product = await productModel.findById(productId);
+      if (!product) {
+        return res.status(404).json({ success: false, message: "Product not found" });
+      }
+  
+      // Find all reviews related to this product
+      const reviews = await reviewModel.find({ product: productId })
+        .populate('user', 'username profile') // Populating the user details (optional)
+        .sort({ createdAt: -1 }); // Sort by newest first (optional)
+      if (reviews.length === 0) {
+        return res.status(404).json({ success: false, message: "No reviews found for this product" });
+      }
+  
+      // Return the reviews
+      res.status(200).json({
+        success: true,
+        reviews,
+      });
+  
+    } catch (error) {
+      console.error('Error fetching product reviews:', error);
+      res.status(500).json({ success: false, message: "Internal Server Error" });
+    }
+  };
+  

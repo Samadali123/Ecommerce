@@ -1,9 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const { addProduct, totalProducts, singleProduct, updateProduct, deleteProduct, productByCategory, searchProducts, sortProducts, uploadImages } = require('../controllers/product.controllers');
-const { AdminIsLoggedIn } = require('../middlewares/auth.middleware');
-const upload = require("../utils/multer")
-
+const { addProduct, totalProducts, singleProduct, updateProduct, deleteProduct, productByCategory, searchProducts, sortProducts, uploadImages, addReview, getProductReviews } = require('../controllers/product.controllers');
+const { AdminIsLoggedIn, UserIsLoggedIn } = require('../middlewares/auth.middleware');
+const upload = require("../utils/multer");
 
 // /add
 // router.post("/add", [AdminIsLoggedIn, uploadImages], addProduct);
@@ -28,7 +27,12 @@ router.get("/category",  productByCategory);
 router.get("/searchproducts", searchProducts);
 
 //filter products
-router.get("/filterproducts",  sortProducts)
+router.get("/filterproducts",  sortProducts);
 
+// /add/review
+router.post("/add/review", UserIsLoggedIn, addReview);
 
-module.exports = router
+// /product/:productId/reviews
+router.get('/product/:productId/reviews', UserIsLoggedIn, getProductReviews);
+
+module.exports = router;

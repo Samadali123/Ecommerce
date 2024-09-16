@@ -1,12 +1,13 @@
 
-
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const userModel = require('../models/user.model');
+const cartModel = require("../models/cart.model")
 const  {sendToken}= require("../utils/sendToken")
 const secretKey = process.env.JWT_SECRET_KEY;
+
 
 // Initialize nodemailer transporter
 const transporter = nodemailer.createTransport({
@@ -80,7 +81,6 @@ exports.loginWithGoogle = async (req, res) => {
         res.status(500).json({ success: false, message:  error.message});
     }
 };
-
 
 
 // User logout
@@ -235,57 +235,91 @@ exports.getUserProfile = async (req, res) => {
 
 
 
-exports.checkout = async (req, res) => {
+exports.editProfileImage = async (req, res) => {
     try {
-        const loginUserEmail = req.user.email;
+      const loginuser = await userModel.findOne({email : req.user.email});
+      // Validate that a user ID is provided
+      if (! loginuser) {
+        return res.status(400).json({ success: false, message: "Login user is required" });
+      }
+  
+      // Find the user by ID
+      const user = await userModel.findById(loginuser._id);
+      if (!user) {
+        return res.status(404).json({ success: false, message: "User not found" });
+      }
+  
+      // Ensure that a file was uploaded
+      if (!req.file) {
+        return res.status(400).json({ success: false, message: "Please upload an image" });
+      }
+  
+      // Update the user's profile image URL with Cloudinary's image URL
+      const imageUrl = req.file.path; // Cloudinary automatically provides the URL in `req.file.path`
+      // Update the user's profile image in the database
+      user.profile = imageUrl;
+      await user.save();
+  
+      // Respond with success message and updated image URL
+      res.status(200).json({
+        success: true,
+        message: 'Profile image updated successfully',
+        user
+      });
 
-        // Find the logged-in user
-        const user = await User.findOne({ email: loginUserEmail }).populate("mycart");
+    } catch (error) {
+      console.error('Error updating profile image:', error);
+      res.status(500).json({ success: false, message: "Internal Server Error" });
+    }
+  };
 
-        if (!user) {
-            return res.status(404).json({ success: false, message: "User not found" });
+
+
+
+  exports.checkout = async (req, res) => {
+    try {
+        // Fetch the cart for the logged-in user
+        const cart = await cartModel.findOne({ user: req.user.userid }).populate({
+            path: 'items.product',
+            select: 'name priceAfterDiscount' // Only populate required fields
+        });
+        
+        // Check if the cart exists
+        if (!cart) {
+            return res.status(404).json({ success: false, message: "Cart not found" });
         }
 
-        // Ensure the cart is not empty
-        if (user.mycart.length === 0) {
+        // Check if the cart has items
+        if (cart.items.length === 0) {
             return res.status(400).json({ success: false, message: "Cart is empty" });
         }
 
-        // Calculate total amount
+        // Calculate the total amount
         let totalAmount = 0;
-        const orderProducts = user.mycart.map(item => {
-            totalAmount += item.product.price * item.quantity;
-            return { product: item._id, quantity: item.quantity };
+        const cartItems = cart.items.map(item => {
+            const itemTotal = item.product.priceAfterDiscount * item.quantity;
+            totalAmount += itemTotal;
+            return {
+                product: item.product._id,
+                name: item.product.name,
+                quantity: item.quantity,
+                priceAfterDiscount: item.product.priceAfterDiscount,
+                itemTotal
+            };
         });
 
-        // Create a new order
-        const newOrder = new Order({
-            products: orderProducts,
-            totalAmount: totalAmount
-        });
-
-        // Save the order
-        const savedOrder = await newOrder.save();
-
-        // Add the order to the user's order history
-        user.orders.push(savedOrder._id);
-
-        // Clear the user's cart
-        user.mycart = [];
-
-        // Save the user's updated information
-        await user.save();
-
-        // Respond with the newly created order
+        // Respond with the cart details and total amount
         res.status(200).json({
             success: true,
-            message: "Checkout successful",
-            order: savedOrder,
-            orders: user.orders
-        });
+            message: "Cart details fetched successfully",
+            cart: {
+                items: cartItems,
+                totalAmount
+            }
+        });  
     } catch (error) {
+        console.error('Error fetching cart details:', error);
         res.status(500).json({ success: false, message: "Server error", error: error.message });
     }
 };
-
-
+  
